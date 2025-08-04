@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Aplikasi Pengelolaan Ruangan Rapat</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #a8a29e; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #78716c; }
+        .view, #login-screen { display: none; }
+        .view.active, #login-screen.active { display: flex; }
+        .page { display: none; }
+        .page.active { display: block; }
+        .sidebar-item.active { background-color: #1e40af; /* blue-800 */ }
+        .admin-sidebar-item.active { background-color: #374151; /* gray-700 */ }
+        .modal-content {
+            transform: scale(0.95);
+            opacity: 0;
+            transition: all 0.2s ease-in-out;
+        }
+        .modal.flex .modal-content {
+            transform: scale(1);
+            opacity: 1;
+        }
+        /* Table styles for schedule */
+        .schedule-table th, .schedule-table td {
+            border: 1px solid #e5e7eb;
+            padding: 0.5rem;
+            text-align: center;
+            vertical-align: middle;
+        }
+        .schedule-table th {
+            background-color: #f3f4f6;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+         .schedule-table .time-col {
+            width: 80px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            background-color: #f9fafb;
+            position: sticky;
+            left: 0;
+            z-index: 11;
+        }
+        .booked-cell {
+            color: white;
+            font-size: 0.8rem;
+            line-height: 1.2;
+        }
+        .filter-btn.active {
+            background-color: #2563eb; /* blue-600 */
+            color: white;
+            font-weight: 600;
+        }
+        .star-rating {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: center;
+        }
+        .star-rating label {
+            cursor: pointer;
+            color: #d1d5db; /* gray-300 */
+            transition: color 0.2s;
+        }
+        .star-rating input:checked ~ label,
+        .star-rating label:hover,
+        .star-rating label:hover ~ label {
+            color: #f59e0b; /* amber-500 */
+        }
+        .star-rating input { display: none; }
+    </style>
+</head>
+<body class="bg-gray-100 antialiased">
+
+    <!-- === LAYAR LOGIN === -->
+    <div id="login-screen" class="active items-center justify-center h-screen w-screen p-4">
+        <div class="bg-white p-8 sm:p-10 rounded-xl shadow-2xl text-center max-w-md w-full transition-all">
+            <div class="mx-auto mb-6 h-16 w-16 flex items-center justify-center rounded-full bg-blue-100">
+                <span class="h-8 w-8 hero-icon text-blue-600" data-icon="calendar-days"></span>
+            </div>
+            <h1 class="text-2xl font-bold text-blue-900 mb-4">Layanan Pemesanan Ruangan Rapat Fisik dan Digital</h1>
+            <p class="text-gray-600 mb-8">Silakan masuk sesuai peran Anda</p>
+            <div class="space-y-4">
+                <button id="login-user" class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg">
+                    Masuk sebagai ASN
+                </button>
+                <button id="login-admin" class="w-full bg-gray-800 text-white py-3 rounded-lg font-semibold hover:bg-gray-900 transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg">
+                    Masuk sebagai Admin
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- === CONTAINER APLIKASI UTAMA === -->
+    <div id="app-container" class="hidden h-screen w-screen">
+
+        <!-- === TAMPILAN PENGGUNA (USER VIEW) === -->
+        <div id="user-view" class="view h-full w-full">
+            <aside id="user-sidebar" class="bg-blue-900 text-white w-64 flex-col flex-shrink-0 absolute md:relative inset-y-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out z-30 flex">
+                <header class="p-6 font-bold text-xl border-b border-blue-700 text-center">User Panel</header>
+                <nav class="flex-1 mt-6 user-nav space-y-2 px-2">
+                    <a href="#daftar" class="sidebar-item flex items-center px-4 py-3 hover:bg-blue-800 rounded-lg transition-colors duration-200 cursor-pointer"><span class="h-6 w-6 mr-3 hero-icon" data-icon="home"></span>Daftar Ruangan</a>
+                    <a href="#riwayat" class="sidebar-item flex items-center px-4 py-3 hover:bg-blue-800 rounded-lg transition-colors duration-200 cursor-pointer"><span class="h-6 w-6 mr-3 hero-icon" data-icon="clock"></span>Riwayat Saya</a>
+                    <a href="#notifikasi" class="sidebar-item flex items-center px-4 py-3 hover:bg-blue-800 rounded-lg transition-colors duration-200 cursor-pointer"><span class="h-6 w-6 mr-3 hero-icon" data-icon="bell"></span>Notifikasi</a>
+                    <a href="#flowchart" class="sidebar-item flex items-center px-4 py-3 hover:bg-blue-800 rounded-lg transition-colors duration-200 cursor-pointer"><span class="h-6 w-6 mr-3 hero-icon" data-icon="information-circle"></span>Proses Bisnis</a>
+                </nav>
+                 <footer class="p-4 border-t border-blue-700">
+                    <a href="https://wa.me/6281510599991" target="_blank" class="flex items-center justify-center w-full text-sm text-blue-200 hover:text-white mb-4 transition-colors duration-200">
+                        <span class="h-5 w-5 mr-2 hero-icon" data-icon="chat-bubble-left-ellipsis"></span>
+                        Dukungan WhatsApp
+                    </a>
+                    <button id="logout-btn-user" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200">Logout</button>
+                </footer>
+            </aside>
+            <div id="user-main-content" class="flex-1 flex flex-col">
+                <header class="bg-white shadow-sm p-4 flex items-center md:hidden relative">
+                    <button id="user-menu-btn" class="text-gray-600 hover:text-gray-900 z-10">
+                        <span class="h-6 w-6 block hero-icon" data-icon="bars-3"></span>
+                    </button>
+                    <h1 class="text-lg font-semibold text-gray-800 absolute inset-0 flex items-center justify-center">Aplikasi Ruangan</h1>
+                </header>
+                <main class="flex-1 p-4 sm:p-6 lg:p-8 overflow-auto">
+                    <div id="page-user-daftar" class="page"></div>
+                    <div id="page-user-riwayat" class="page"></div>
+                    <div id="page-user-notifikasi" class="page"></div>
+                    <div id="page-user-flowchart" class="page"></div>
+                </main>
+            </div>
+        </div>
+
+        <!-- === TAMPILAN ADMIN (ADMIN VIEW) === -->
+        <div id="admin-view" class="view h-full w-full">
+             <aside id="admin-sidebar" class="bg-gray-800 text-white w-64 flex-col flex-shrink-0 absolute md:relative inset-y-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out z-30 flex">
+                <header class="p-6 font-bold text-xl border-b border-gray-700 text-center">Admin Panel</header>
+                <nav class="flex-1 mt-6 admin-nav space-y-2 px-2">
+                    <a href="#dashboard" class="admin-sidebar-item flex items-center px-4 py-3 hover:bg-gray-700 rounded-lg transition-colors duration-200 cursor-pointer"><span class="h-6 w-6 mr-3 hero-icon" data-icon="chart-pie"></span>Dashboard</a>
+                    <a href="#reports" class="admin-sidebar-item flex items-center px-4 py-3 hover:bg-gray-700 rounded-lg transition-colors duration-200 cursor-pointer"><span class="h-6 w-6 mr-3 hero-icon" data-icon="chart-bar-square"></span>Laporan Pesanan</a>
+                    <a href="#schedule" class="admin-sidebar-item flex items-center px-4 py-3 hover:bg-gray-700 rounded-lg transition-colors duration-200 cursor-pointer"><span class="h-6 w-6 mr-3 hero-icon" data-icon="calendar-days"></span>Jadwal Ruangan</a>
+                    <a href="#all-bookings" class="admin-sidebar-item flex items-center px-4 py-3 hover:bg-gray-700 rounded-lg transition-colors duration-200 cursor-pointer"><span class="h-6 w-6 mr-3 hero-icon" data-icon="clipboard-document-list"></span>Manajemen Pesanan</a>
+                    <a href="#manage-rooms" class="admin-sidebar-item flex items-center px-4 py-3 hover:bg-gray-700 rounded-lg transition-colors duration-200 cursor-pointer"><span class="h-6 w-6 mr-3 hero-icon" data-icon="building-office-2"></span>Manajemen Ruangan</a>
+                    <a href="#feedback" class="admin-sidebar-item flex items-center px-4 py-3 hover:bg-gray-700 rounded-lg transition-colors duration-200 cursor-pointer"><span class="h-6 w-6 mr-3 hero-icon" data-icon="chat-bubble-left-ellipsis"></span>Feedback Pengguna</a>
+                    <a href="#audit-trail" class="admin-sidebar-item flex items-center px-4 py-3 hover:bg-gray-700 rounded-lg transition-colors duration-200 cursor-pointer"><span class="h-6 w-6 mr-3 hero-icon" data-icon="shield-check"></span>Audit Trail</a>
+                    <a href="#flowchart" class="admin-sidebar-item flex items-center px-4 py-3 hover:bg-gray-700 rounded-lg transition-colors duration-200 cursor-pointer"><span class="h-6 w-6 mr-3 hero-icon" data-icon="information-circle"></span>Proses Bisnis</a>
+                </nav>
+                <footer class="p-4 border-t border-gray-700">
+                    <a href="https://wa.me/6281510599991" target="_blank" class="flex items-center justify-center w-full text-sm text-gray-300 hover:text-white mb-4 transition-colors duration-200">
+                        <span class="h-5 w-5 mr-2 hero-icon" data-icon="chat-bubble-left-ellipsis"></span>
+                        Dukungan WhatsApp
+                    </a>
+                    <button id="logout-btn-admin" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200">Logout</button>
+                </footer>
+            </aside>
+            <div id="admin-main-content" class="flex-1 flex flex-col">
+                <header class="bg-white shadow-sm p-4 flex items-center md:hidden relative">
+                     <button id="admin-menu-btn" class="text-gray-600 hover:text-gray-900 z-10">
+                        <span class="h-6 w-6 block hero-icon" data-icon="bars-3"></span>
+                    </button>
+                    <h1 class="text-lg font-semibold text-gray-800 absolute inset-0 flex items-center justify-center">Admin Panel</h1>
+                </header>
+                <main class="flex-1 p-4 sm:p-6 lg:p-8 overflow-auto">
+                    <div id="page-admin-dashboard" class="page"></div>
+                    <div id="page-admin-reports" class="page"></div>
+                    <div id="page-admin-schedule" class="page"></div>
+                    <div id="page-admin-manage-rooms" class="page"></div>
+                    <div id="page-admin-all-bookings" class="page"></div>
+                    <div id="page-admin-feedback" class="page"></div>
+                    <div id="page-admin-audit-trail" class="page"></div>
+                    <div id="page-admin-flowchart" class="page"></div>
+                </main>
+            </div>
+        </div>
+    </div>
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden md:hidden"></div>
+    
+    <!-- === MODALS === -->
+    <div id="booking-modal" class="modal fixed inset-0 bg-black bg-opacity-50 z-40 hidden items-center justify-center p-4">
+        <div class="modal-content bg-white rounded-lg shadow-xl p-6 sm:p-8 max-w-lg w-full"></div>
+    </div>
+    <div id="room-modal" class="modal fixed inset-0 bg-black bg-opacity-50 z-40 hidden items-center justify-center p-4">
+        <div class="modal-content bg-white rounded-lg shadow-xl p-6 sm:p-8 max-w-lg w-full"></div>
+    </div>
+     <div id="feedback-modal" class="modal fixed inset-0 bg-black bg-opacity-50 z-40 hidden items-center justify-center p-4">
+        <div class="modal-content bg-white rounded-lg shadow-xl p-6 sm:p-8 max-w-lg w-full"></div>
+    </div>
+    <div id="alert-modal" class="modal fixed inset-0 bg-black bg-opacity-60 z-50 hidden items-center justify-center p-4">
+        <div class="modal-content bg-white rounded-lg shadow-xl p-6 max-w-sm w-full text-center">
+            <div id="alert-icon" class="mx-auto mb-4"></div>
+            <h3 id="alert-title" class="text-xl font-bold text-gray-800 mb-2"></h3>
+            <p id="alert-message" class="text-gray-600 mb-4"></p>
+            <p id="alert-email-info" class="text-xs text-gray-400 mt-2 mb-6 hidden"></p>
+            <button id="alert-ok-btn" class="bg-blue-600 text-white px-8 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300">OK</button>
+        </div>
+    </div>
+    <div id="confirm-modal" class="modal fixed inset-0 bg-black bg-opacity-60 z-50 hidden items-center justify-center p-4">
+        <div class="modal-content bg-white rounded-lg shadow-xl p-6 max-w-sm w-full text-center">
+            <div id="confirm-icon" class="mx-auto mb-4"></div>
+            <h3 id="confirm-title" class="text-xl font-bold text-gray-800 mb-2"></h3>
+            <p id="confirm-message" class="text-gray-600 mb-6"></p>
+            <div class="flex justify-center gap-4">
+                 <button id="confirm-cancel-btn" class="bg-gray-200 text-gray-800 px-6 py-2 rounded-md hover:bg-gray-300 font-semibold transition-colors duration-200">Batal</button>
+                 <button id="confirm-ok-btn" class="text-white px-6 py-2 rounded-md font-semibold transition-colors duration-200">Ya, Lanjutkan</button>
+            </div>
+        </div>
+    </div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    
+    mermaid.initialize({ startOnLoad: false, theme: 'neutral' });
+
+    // =================================================================
+    // 1. DATA, STATE, AND CONSTANTS
+    // =================================================================
+    const usersData = [ { id: 'user01', name: 'Budi Santoso' }, { id: 'user02', name: 'Citra Lestari' }, { id: 'admin01', name: 'Admin Utama' } ];
+    let roomsData = [ 
+        { id: 1, name: 'Ruang Tengkawang', type: 'Fisik', capacity: 30, facilities: 'Proyektor, AC, Wifi' },
+        { id: 3, name: 'Ruang Audio Visual', type: 'Fisik', capacity: 20, facilities: 'Speaker, LCD, AC' }, 
+        { id: 4, name: 'Ruang Garuda', type: 'Fisik', capacity: 50, facilities: 'Proyektor, Sound System' },
+        { id: 6, name: 'Ruang Data Analitik', type: 'Fisik', capacity: 15, facilities: 'Video Conference, Smart TV' },
+        { id: 2, name: 'Zoom 1 (100)', type: 'Digital', capacity: 100, facilities: 'Recording, Share Screen' },
+        { id: 7, name: 'Zoom 2 (100)', type: 'Digital', capacity: 100, facilities: 'Recording, Share Screen' },
+        { id: 5, name: 'Zoom 3 (1000)', type: 'Digital', capacity: 1000, facilities: 'Webinar, Breakout Rooms' }
+    ];
+    
+    const TODAY_DATE = new Date('2025-07-28');
+    
+    function generateDummyBookings() {
+        let bookings = [];
+        let idCounter = 1;
+        const activities = ["Rapat Rutin", "Presentasi Klien", "Training Internal", "Diskusi Proyek", "Wawancara Kandidat", "Brainstorming Sesi", "Webinar"];
+        const statuses = ["Disetujui", "Selesai", "Menunggu Persetujuan", "Ditolak"];
+
+        for (let i = 0; i < 90; i++) {
+            let date = new Date(TODAY_DATE);
+            date.setDate(TODAY_DATE.getDate() - i);
+            let dateString = date.toISOString().split('T')[0];
+
+            // Add more bookings on recent days
+            const bookingsPerDay = i < 10 ? Math.floor(Math.random() * 5) + 2 : Math.floor(Math.random() * 3);
+
+            for (let j = 0; j < bookingsPerDay; j++) {
+                const room = roomsData[Math.floor(Math.random() * roomsData.length)];
+                const user = usersData[Math.floor(Math.random() * usersData.length)];
+                const startHour = Math.floor(Math.random() * 8) + 8; // 8 AM to 3 PM
+                const duration = Math.floor(Math.random() * 3) + 1; // 1 to 3 hours
+                const endHour = startHour + duration;
+                
+                let status = statuses[Math.floor(Math.random() * statuses.length)];
+                if (date < TODAY_DATE && status === 'Disetujui') {
+                    status = 'Selesai';
+                }
+                if (date >= TODAY_DATE && status === 'Selesai') {
+                    status = 'Disetujui';
+                }
+
+                bookings.push({
+                    id: `b${String(idCounter++).padStart(3, '0')}`,
+                    roomId: room.id,
+                    userId: user.id,
+                    activity: activities[Math.floor(Math.random() * activities.length)],
+                    date: dateString,
+                    start: `${String(startHour).padStart(2, '0')}:00`,
+                    end: `${String(endHour).padStart(2, '0')}:00`,
+                    status: status
+                });
+            }
+        }
+        return bookings;
+    }
+    
+    let bookingsData = generateDummyBookings();
+    let feedbackData = [
+        { bookingId: 'b004', rating: 5, comment: 'Sesi webinar berjalan lancar, koneksi stabil.'},
+        { bookingId: 'b005', rating: 4, comment: 'AC di ruangan agak terlalu dingin, tapi secara keseluruhan fasilitasnya bagus.'}
+    ];
+    let notificationsData = [ { userId: 'user01', message: 'Pesanan Anda untuk Ruang Garuda (29 Juli 2025) telah dikonfirmasi.', time: '1 jam yang lalu', read: false }, { userId: 'admin01', message: 'Rapat "Dewan Direksi" akan dimulai dalam 1 jam.', time: '2 jam yang lalu', read: false }, { userId: 'user02', message: 'Pesanan untuk "Pelatihan Internal Batch 1" telah selesai.', time: '3 hari yang lalu', read: true }, { userId: 'all', message: 'Maintenance sistem akan dilakukan pada hari Sabtu.', time: '2 hari yang lalu', read: false }, ];
+    let auditTrailData = [
+        { user: 'Budi Santoso', action: 'Mengajukan pesanan untuk Ruang Garuda', time: new Date(TODAY_DATE.getTime() - 2 * 60 * 60 * 1000) },
+        { user: 'Admin Utama', action: 'Menyetujui pesanan untuk Ruang Garuda', time: new Date(TODAY_DATE.getTime() - 1 * 60 * 60 * 1000) },
+        { user: 'Citra Lestari', action: 'Memberikan feedback 4 bintang untuk Ruang Tengkawang', time: new Date(TODAY_DATE.getTime() - 3 * 24 * 60 * 60 * 1000) },
+        { user: 'Admin Utama', action: 'Menambahkan ruangan baru: Zoom 3 (1000)', time: new Date(TODAY_DATE.getTime() - 5 * 24 * 60 * 60 * 1000) },
+    ];
+    let currentUser = null; 
+    let scheduleRoomFilter = 'all'; 
+    let reportRoomFilter = 'all'; // State for report room type filter
+    let reportDateRange = 30; // State for report date range (default 30 days)
+    let charts = {}; // To store chart instances
+
+    // DOM Elements
+    const loginScreen = document.getElementById('login-screen');
+    const userView = document.getElementById('user-view');
+    const adminView = document.getElementById('admin-view');
+    const sidebarOverlay = document.getElementById('sidebar-overlay');
+    const userSidebar = document.getElementById('user-sidebar');
+    const adminSidebar = document.getElementById('admin-sidebar');
+    const userMenuBtn = document.getElementById('user-menu-btn');
+    const adminMenuBtn = document.getElementById('admin-menu-btn');
+
+    // Heroicons SVG paths
+    const heroIcons = {
+        'home': '<path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />',
+        'clock': '<path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />',
+        'bell': '<path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />',
+        'chart-pie': '<path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6a7.5 7.5 0 1 0 7.5 7.5h-7.5V6Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0 0 13.5 3v7.5Z" />',
+        'chart-bar-square': '<path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z" />',
+        'building-office-2': '<path stroke-linecap="round" stroke-linejoin="round" d="M21 12.793V21H3v-8.207l9-9 9 9Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M13 21v-5a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v5" />',
+        'calendar-days': '<path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0h18M-4.5 12h18" />',
+        'clipboard-document-list': '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 5.25 6h.008a2.25 2.25 0 0 1 2.242 2.12 48.422 48.422 0 0 0 1.123.08M10.5 18.75v-15a2.25 2.25 0 0 0-2.25-2.25H5.25A2.25 2.25 0 0 0 3 6v15a2.25 2.25 0 0 0 2.25 2.25h5.25a2.25 2.25 0 0 0 2.25-2.25Z" />',
+        'bars-3': '<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />',
+        'check-circle': '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />',
+        'x-circle': '<path stroke-linecap="round" stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />',
+        'question-mark-circle': '<path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z" />',
+        'check': '<path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />',
+        'x-mark': '<path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />',
+        'trash': '<path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.134-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.067-2.09 1.02-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />',
+        'pencil': '<path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />',
+        'information-circle': '<path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />',
+        'wifi': '<path stroke-linecap="round" stroke-linejoin="round" d="M8.288 15.038a5.25 5.25 0 0 1 7.424 0M5.136 11.886a8.25 8.25 0 0 1 13.728 0M2.015 8.708a11.25 11.25 0 0 1 19.97 0" />',
+        'inbox-arrow-down': '<path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />',
+        'document-duplicate': '<path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75" />',
+        'arrow-trending-up': '<path stroke-linecap="round" stroke-linejoin="round" d="m2.25 18 9-9 4.5 4.5L21.75 6" />',
+        'check-badge': '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" />',
+        'star': '<path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.32 1.011l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 21.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .32-1.011l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z" />',
+        'star-solid': '<path fill="currentColor" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.32 1.011l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 21.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .32-1.011l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z" />',
+        'chat-bubble-left-ellipsis': '<path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.76 9.76 0 0 1-2.53-.388A5.887 5.887 0 0 0 5.25 21.75l-2.53-.388A9.76 9.76 0 0 1 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z" />',
+        'shield-check': '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />'
+    };
+    
+    // =================================================================
+    // 2. FUNCTIONS
+    // =================================================================
+
+    /** Initializes all hero-icon placeholders with SVG content. */
+    function initIcons() {
+        document.querySelectorAll('.hero-icon').forEach(el => {
+            const iconName = el.dataset.icon;
+            if (heroIcons[iconName]) {
+                el.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-full h-full">${heroIcons[iconName]}</svg>`;
+            }
+        });
+    }
+
+    /** Logs in a user or admin, and renders the appropriate view. */
+    function login(role) {
+        if (role === 'user') {
+            currentUser = { id: 'user01', name: 'Budi Santoso', role: 'user' };
+            userView.classList.add('active');
+        } else {
+            currentUser = { id: 'admin01', name: 'Admin Utama', role: 'admin' };
+            adminView.classList.add('active');
+        }
+        loginScreen.classList.remove('active');
+        document.getElementById('app-container').style.display = 'flex';
+        renderAll();
+    }
+
+    /** Logs out the current user and returns to the login screen. */
+    function logout() {
+        currentUser = null;
+        document.getElementById('app-container').style.display = 'none';
+        userView.classList.remove('active');
+        adminView.classList.remove('active');
+        loginScreen.classList.add('active');
+    }
+
+    /** Handles navigation between pages within a view (user or admin). */
+    function navigate(view, hash) {
+        document.querySelectorAll(`#${view}-view .page`).forEach(p => p.classList.remove('active'));
+        const targetPage = document.querySelector(`#page-${view}-${hash}`);
+        if (targetPage) {
+            targetPage.classList.add('active');
+            if (hash === 'flowchart') {
+                setTimeout(() => {
+                    mermaid.run({
+                        nodes: document.querySelectorAll(`#page-${view}-${hash} .mermaid`),
+                    });
+                }, 10);
+            }
+        }
+        
+        document.querySelectorAll(`#${view}-view .sidebar-item, #${view}-view .admin-sidebar-item`).forEach(i => i.classList.remove('active'));
+        const targetLink = document.querySelector(`#${view}-view a[href="#${hash}"]`);
+        if (targetLink) targetLink.classList.add('active');
+        
+        if (window.innerWidth < 768) {
+             if (view === 'user') userSidebar.classList.add('-translate-x-full');
+             if (view === 'admin') adminSidebar.classList.add('-translate-x-full');
+             sidebarOverlay.classList.add('hidden');
+        }
+    }
+    
+    function renderAdminFeedbackPage() {
+        const container = document.getElementById('page-admin-feedback');
+        if (!container) return;
+
+        if (feedbackData.length === 0) {
+            container.innerHTML = renderEmptyState(
+                'Belum Ada Feedback',
+                'Belum ada masukan dari pengguna.',
+                'chat-bubble-left-ellipsis'
+            );
+            initIcons();
+            return;
+        }
+
+        const listItemsHTML = feedbackData.map(f => {
+            const booking = bookingsData.find(b => b.id === f.bookingId) || {};
+            const room = roomsData.find(r => r.id === booking.roomId) || {};
+            const user = usersData.find(u => u.id === booking.userId) || {};
+            const date = booking.date ? new Date(booking.date).toLocaleDateString('id-ID', {
+                day: 'numeric', month: 'long', year: 'numeric'
+            }) : '-';
+
+            const stars = Array.from({ length: 5 }, (_, i) => `
+                <span class="h-5 w-5 hero-icon ${i < f.rating ? 'text-amber-400' : 'text-gray-300'}" data-icon="star-solid"></span>
+            `).join('');
+
+            return `
+            <div class="bg-white p-4 rounded-lg shadow-md mb-4">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="font-bold text-gray-800">${room.name || 'Ruangan Dihapus'}</p>
+                        <p class="text-sm text-gray-600">${booking.activity || 'Aktivitas Tidak Diketahui'}</p>
+                        <p class="text-xs text-gray-500 mt-1">Oleh: ${user.name || 'Pengguna Tidak Diketahui'} pada ${date}</p>
+                    </div>
+                    <div class="flex items-center space-x-1">${stars}</div>
+                </div>
+                <p class="mt-3 text-gray-700 text-sm italic border-l-4 border-gray-200 pl-4">"${f.comment}"</p>
+            </div>`;
+        }).join('');
+
+        container.innerHTML = `
+            <h1 class="text-2xl lg:text-3xl font-bold mb-6 text-gray-800">Feedback Pengguna</h1>
+            <div>${listItemsHTML}</div>
+        `;
+        initIcons();
+    }
+
+
+    /** Renders all content based on the current user's role. */
+    function renderAll() {
+        if (!currentUser) return;
+        if (currentUser.role === 'user') {
+            renderUserDaftarPage();
+            renderUserRiwayatPage();
+            renderUserNotifikasiPage();
+            renderFlowchartPage('user');
+            navigate('user', 'daftar');
+        } else if (currentUser.role === 'admin') {
+            renderAdminDashboard();
+            renderAdminReportsPage();
+            renderAdminSchedulePage(TODAY_DATE.toISOString().split('T')[0], scheduleRoomFilter);
+            renderAdminManageRooms();
+            renderAdminAllBookings();
+            renderAdminFeedbackPage();
+            renderFlowchartPage('admin');
+            navigate('admin', 'dashboard');
+        }
+        initIcons();
+    }
+    
+    /** Checks booking status based on date */
+    function getBookingStatus(booking) {
+        if (booking.status === 'Ditolak') return { text: 'Ditolak', class: 'bg-red-100 text-red-800' };
+        if (booking.status === 'Menunggu Persetujuan') return { text: 'Menunggu Persetujuan', class: 'bg-orange-100 text-orange-800' };
+        if (new Date(booking.date) < TODAY_DATE) return { text: 'Selesai', class: 'bg-gray-200 text-gray-800' };
+        return { text: 'Disetujui', class: 'bg-green-100 text-green-800' };
+    }
+
+
+    // --- User View Rendering ---
+    
+    function renderUserDaftarPage() {
+        const container = document.getElementById('page-user-daftar');
+        if (!container) return;
+        const todayString = TODAY_DATE.toISOString().split('T')[0];
+        let roomListHTML = roomsData.map(room => {
+            const isBookedToday = bookingsData.some(b => b.roomId === room.id && b.date === todayString && b.status === 'Disetujui');
+            const statusClass = isBookedToday ? 'text-yellow-600' : 'text-green-600';
+            const statusText = isBookedToday ? 'Ada Jadwal' : 'Tersedia';
+            const typeIcon = room.type === 'Fisik' ? 'building-office-2' : 'wifi';
+            return `
+                <div class="bg-white rounded-lg shadow-lg p-5 flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                    <div>
+                        <h3 class="font-bold text-lg mb-2 text-gray-800">${room.name}</h3>
+                        <div class="flex items-center text-sm mb-1 text-gray-500">
+                           <span class="hero-icon h-4 w-4 mr-2 text-gray-400" data-icon="${typeIcon}"></span>
+                           Tipe: <span class="font-medium text-gray-700 ml-1">${room.type}</span>
+                        </div>
+                        <p class="text-sm mb-1 text-gray-500 pl-6">Kapasitas: ${room.capacity} ${room.type === 'Fisik' ? 'orang' : 'peserta'}</p>
+                        <p class="text-sm mb-3 pl-6">Status Hari Ini: <span class="font-semibold ${statusClass}">${statusText}</span></p>
+                    </div>
+                    <button data-room-id="${room.id}" class="open-booking-modal-btn w-full mt-4 bg-blue-600 text-white hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-semibold px-4 py-2 rounded-md transition-all duration-200">Pesan</button>
+                </div>`;
+        }).join('');
+        container.innerHTML = `
+            <h1 class="text-2xl lg:text-3xl font-bold mb-6 text-gray-800">Daftar Ruangan Rapat</h1>
+            <section id="room-list-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-10">${roomListHTML}</section>`;
+    }
+
+    function renderEmptyState(title, message, icon) {
+        return `
+            <div class="text-center p-10 mt-8 text-gray-500 bg-white rounded-lg shadow-md">
+                <div class="mx-auto h-12 w-12 text-gray-400 hero-icon" data-icon="${icon}"></div>
+                <h3 class="mt-2 text-sm font-medium text-gray-900">${title}</h3>
+                <p class="mt-1 text-sm text-gray-500">${message}</p>
+            </div>
+        `;
+    }
+
+    function renderUserRiwayatPage() {
+        const container = document.getElementById('page-user-riwayat');
+        if (!container) return;
+        const myBookings = bookingsData.filter(b => b.userId === currentUser.id).sort((a, b) => new Date(b.date) - new Date(a.date));
+        let listHTML = '';
+        if (myBookings.length === 0) {
+            listHTML = renderEmptyState('Belum Ada Riwayat', 'Anda belum pernah membuat pesanan.', 'document-duplicate');
+        } else {
+            listHTML = myBookings.map(booking => {
+                const room = roomsData.find(r => r.id === booking.roomId);
+                const status = getBookingStatus(booking);
+                const hasFeedback = feedbackData.some(f => f.bookingId === booking.id);
+                let feedbackButton = '';
+                if (status.text === 'Selesai' && !hasFeedback) {
+                    feedbackButton = `<button data-booking-id="${booking.id}" class="open-feedback-modal-btn mt-2 sm:mt-0 sm:ml-4 text-sm bg-blue-100 text-blue-700 font-semibold py-1 px-3 rounded-md hover:bg-blue-200 transition-colors">Beri Penilaian</button>`;
+                }
+
+                return `
+                <div class="bg-white p-4 rounded-lg shadow-md mb-4 flex flex-col sm:flex-row sm:justify-between sm:items-center">
+                    <div class="flex-grow mb-4 sm:mb-0">
+                        <p class="font-bold text-gray-800">${room.name}</p>
+                        <p class="text-sm text-gray-600">${booking.activity}</p>
+                        <p class="text-sm text-gray-500 mt-1">${new Date(booking.date).toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'})} | ${booking.start} - ${booking.end}</p>
+                    </div>
+                    <div class="flex-shrink-0 flex items-center">
+                        <span class="px-3 py-1 text-xs font-semibold rounded-full ${status.class}">${status.text}</span>
+                        ${feedbackButton}
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+        container.innerHTML = `<h1 class="text-2xl lg:text-3xl font-bold mb-6 text-gray-800">Riwayat Pesanan Saya</h1><div>${listHTML}</div>`;
+    }
+
+    function renderUserNotifikasiPage() {
+        const container = document.getElementById('page-user-notifikasi');
+        if (!container) return;
+        const myNotifications = notificationsData.filter(n => n.userId === currentUser.id || n.userId === 'all').sort((a, b) => new Date(b.rawTime) - new Date(a.rawTime));
+        let listHTML;
+        if (myNotifications.length === 0) {
+            listHTML = renderEmptyState('Tidak Ada Notifikasi', 'Kotak masuk Anda kosong.', 'inbox-arrow-down');
+        } else {
+            listHTML = myNotifications.map(notif => {
+                const bgClass = notif.read ? 'bg-white' : 'bg-blue-50';
+                return `<div class="p-4 border-b ${bgClass} hover:bg-gray-100 transition-colors duration-200">
+                    <p class="text-gray-800 text-sm">${notif.message}</p>
+                    <p class="text-xs text-gray-500 mt-1">${notif.time}</p>
+                </div>`;
+            }).join('');
+        }
+
+        container.innerHTML = `<h1 class="text-2xl lg:text-3xl font-bold mb-6 text-gray-800">Notifikasi</h1>
+            <div class="bg-white rounded-lg shadow-lg max-w-2xl mx-auto overflow-hidden">${listHTML}</div>`;
+    }
+
+    function renderFlowchartPage(role) {
+        const containerId = `page-${role}-flowchart`;
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        const diagramSyntax = `
+sequenceDiagram
+    participant P as Pengguna
+    participant S as Sistem Aplikasi
+    participant A as Admin
+
+    P->>S: Buka Aplikasi dan Login
+    S-->>P: Tampilkan Daftar Ruangan
+
+    P->>S: Pilih Ruangan dan Ajukan Pesanan
+    S->>S: Simpan Pesanan (status: Menunggu)
+    S-->>A: Notifikasi: Pengajuan Baru
+
+    A->>S: Buka Manajemen Pesanan
+    A->>S: Lihat Jadwal Ruangan
+    S-->>A: Tampilkan Jadwal
+    
+    A->>S: Setujui / Tolak Pesanan
+    S->>S: Update Status Pesanan
+    S-->>P: Notifikasi: Hasil Persetujuan
+    
+    P->>S: Logout
+    A->>S: Logout
+`;
+
+        const contentHTML = `
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h1 class="text-2xl lg:text-3xl font-bold mb-4 text-gray-800 border-b pb-2">Diagram Proses Bisnis</h1>
+                <p class="mb-6 text-gray-600">Diagram ini mengilustrasikan alur interaksi antara Pengguna, Sistem, dan Admin dari awal hingga akhir proses pemesanan ruangan.</p>
+                <div class="mermaid p-4 border rounded-lg bg-gray-50 text-center">
+${diagramSyntax}
+                </div>
+            </div>
+        `;
+
+        container.innerHTML = contentHTML;
+    }
+    
+    // --- Admin View Rendering ---
+    
+    function renderAdminDashboard() {
+        const container = document.getElementById('page-admin-dashboard');
+        if (!container) return;
+        
+        const timeToMinutes = time => { const [h, m] = time.split(':').map(Number); return h * 60 + m; };
+        
+        const endDate = TODAY_DATE;
+        const startDate = new Date(endDate);
+        startDate.setDate(endDate.getDate() - reportDateRange);
+
+        const filteredBookings = bookingsData.filter(b => {
+            const bookingDate = new Date(b.date);
+            return bookingDate >= startDate && bookingDate <= endDate;
+        });
+        
+        const filteredRoomsByType = reportRoomFilter === 'all' ? roomsData : roomsData.filter(r => r.type === reportRoomFilter);
+        const filteredRoomIds = new Set(filteredRoomsByType.map(r => r.id));
+        const finalFilteredBookings = filteredBookings.filter(b => filteredRoomIds.has(b.roomId));
+
+        // KPI Calculations
+        const approvedAndFinished = finalFilteredBookings.filter(b => b.status === 'Disetujui' || getBookingStatus(b).text === 'Selesai');
+        const totalRequests = finalFilteredBookings.filter(b => ['Disetujui', 'Ditolak', 'Selesai'].includes(b.status) || getBookingStatus(b).text === 'Selesai').length;
+        const approvalRate = totalRequests > 0 ? (approvedAndFinished.length / totalRequests * 100).toFixed(1) : 0;
+        
+        let occupancyRate = 0;
+        if (reportRoomFilter !== 'Digital') {
+            const physicalRoomsInFilter = filteredRoomsByType.filter(r => r.type === 'Fisik');
+            const totalAvailableHours = physicalRoomsInFilter.length * 9 * reportDateRange;
+            const totalBookedHours = approvedAndFinished
+                .filter(b => physicalRoomsInFilter.some(r => r.id === b.roomId))
+                .reduce((acc, b) => acc + (timeToMinutes(b.end) - timeToMinutes(b.start)) / 60, 0);
+            occupancyRate = totalAvailableHours > 0 ? (totalBookedHours / totalAvailableHours * 100).toFixed(1) : 0;
+        }
+
+        const roomUsage = approvedAndFinished.reduce((acc, b) => { acc[b.roomId] = (acc[b.roomId] || 0) + 1; return acc; }, {});
+        const mostPopularRoomId = Object.keys(roomUsage).length > 0 ? Object.keys(roomUsage).reduce((a, b) => roomUsage[a] > roomUsage[b] ? a : b) : null;
+        const mostPopularRoom = mostPopularRoomId ? roomsData.find(r => r.id === parseInt(mostPopularRoomId))?.name : 'N/A';
+        
+        const totalRatings = feedbackData.reduce((acc, f) => acc + f.rating, 0);
+        const averageRating = feedbackData.length > 0 ? (totalRatings / feedbackData.length).toFixed(1) : 'N/A';
+        
+        const kpiCards = [
+            { title: 'Rating Kepuasan', value: averageRating, icon: 'star', color: 'text-amber-500', show: true },
+            { title: 'Tingkat Penggunaan', value: `${occupancyRate}%`, icon: 'arrow-trending-up', color: 'text-blue-600', show: reportRoomFilter !== 'Digital' },
+            { title: 'Tingkat Persetujuan', value: `${approvalRate}%`, icon: 'check-badge', color: 'text-green-600', show: true },
+        ];
+
+        const dateFiltersHTML = `<div id="report-date-filters" class="p-1 bg-gray-200 rounded-lg flex space-x-1">
+                <button data-range="7" class="filter-btn w-full px-3 py-1 text-sm rounded-md transition-colors ${reportDateRange === 7 ? 'active' : 'hover:bg-gray-300'}">7 Hari</button>
+                <button data-range="30" class="filter-btn w-full px-3 py-1 text-sm rounded-md transition-colors ${reportDateRange === 30 ? 'active' : 'hover:bg-gray-300'}">30 Hari</button>
+                <button data-range="90" class="filter-btn w-full px-3 py-1 text-sm rounded-md transition-colors ${reportDateRange === 90 ? 'active' : 'hover:bg-gray-300'}">90 Hari</button>
+            </div>`;
+            
+        const typeFiltersHTML = `<div id="report-type-filters" class="p-1 bg-gray-200 rounded-lg flex space-x-1">
+                <button data-type-filter="all" class="filter-btn w-full px-3 py-1 text-sm rounded-md transition-colors ${reportRoomFilter === 'all' ? 'active' : 'hover:bg-gray-300'}">Semua</button>
+                <button data-type-filter="Fisik" class="filter-btn w-full px-3 py-1 text-sm rounded-md transition-colors ${reportRoomFilter === 'Fisik' ? 'active' : 'hover:bg-gray-300'}">Fisik</button>
+                <button data-type-filter="Digital" class="filter-btn w-full px-3 py-1 text-sm rounded-md transition-colors ${reportRoomFilter === 'Digital' ? 'active' : 'hover:bg-gray-300'}">Digital</button>
+            </div>`;
+        
+        container.innerHTML = `
+            <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                <h1 class="text-2xl lg:text-3xl font-bold text-gray-800">Dashboard & Analitik</h1>
+                 <div class="flex flex-col sm:flex-row gap-4">${typeFiltersHTML}${dateFiltersHTML}</div>
+            </header>
+            <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                ${kpiCards.filter(kpi => kpi.show).map(kpi => `
+                    <div class="bg-white p-5 rounded-xl shadow-lg flex items-start space-x-4">
+                        <div class="flex-shrink-0 h-12 w-12 flex items-center justify-center rounded-full ${kpi.color.replace('text-', 'bg-')}/10">
+                            <span class="h-6 w-6 hero-icon ${kpi.color}" data-icon="${kpi.icon}"></span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                           <p class="text-sm text-gray-500 font-medium">${kpi.title}</p>
+                           <p class="text-xl font-bold text-gray-800 break-words" title="${kpi.value}">${kpi.value}</p>
+                        </div>
+                    </div>`).join('')}
+            </section>
+            <section class="space-y-8">
+                 <div class="bg-white p-6 rounded-xl shadow-lg"><h3 class="font-bold text-lg mb-4 text-gray-700">Pesanan per Ruangan</h3><div class="h-80 relative"><canvas id="bookingsByRoomChart"></canvas></div></div>
+                 <div class="bg-white p-6 rounded-xl shadow-lg"><h3 class="font-bold text-lg mb-4 text-gray-700">Analisis Jam Sibuk</h3><div class="h-80 relative"><canvas id="peakHoursChart"></canvas></div></div>
+            </section>
+        `;
+        
+        if (charts.bookingsByRoom) charts.bookingsByRoom.destroy();
+        if (charts.peakHours) charts.peakHours.destroy();
+
+        const bookingsByRoomCanvas = document.getElementById('bookingsByRoomChart');
+        const peakHoursCanvas = document.getElementById('peakHoursChart');
+
+        if (!bookingsByRoomCanvas || !peakHoursCanvas) return;
+        
+        const bookingsByRoomCtx = bookingsByRoomCanvas.getContext('2d');
+        const roomLabels = filteredRoomsByType.map(r => r.name);
+        const roomData = filteredRoomsByType.map(r => roomUsage[r.id] || 0);
+        
+        charts.bookingsByRoom = new Chart(bookingsByRoomCtx, {
+            type: 'doughnut',
+            data: { 
+                labels: roomLabels, 
+                datasets: [{ 
+                    data: roomData, 
+                    backgroundColor: ['#3b82f6', '#10b981', '#8b5cf6', '#ef4444', '#f97316', '#f59e0b', '#64748b'].slice(0, roomLabels.length),
+                    borderColor: '#fff',
+                    borderWidth: 2,
+                }] 
+            },
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false,
+                plugins: { 
+                    legend: { 
+                        position: 'bottom',
+                        labels: {
+                            boxWidth: 12,
+                            padding: 15
+                        }
+                    } 
+                },
+            }
+        });
+        
+        const peakHoursCtx = peakHoursCanvas.getContext('2d');
+        const hoursLabels = Array.from({length: 10}, (_, i) => `${String(i + 8).padStart(2, '0')}:00`);
+        const hoursData = Array(10).fill(0);
+        approvedAndFinished.forEach(b => {
+            const startHour = parseInt(b.start.split(':')[0]);
+            const endHour = parseInt(b.end.split(':')[0]);
+            for (let h = startHour; h < endHour; h++) { if (h >= 8 && h < 18) { hoursData[h-8]++; } }
+        });
+
+        const barGradient = peakHoursCtx.createLinearGradient(0, 0, 0, peakHoursCanvas.height);
+        barGradient.addColorStop(0, 'rgba(16, 185, 129, 0.7)');
+        barGradient.addColorStop(1, 'rgba(107, 235, 198, 0.7)');
+
+        charts.peakHours = new Chart(peakHoursCtx, {
+            type: 'bar',
+            data: { labels: hoursLabels, datasets: [{ 
+                label: 'Jumlah Pesanan Aktif', 
+                data: hoursData, 
+                backgroundColor: barGradient,
+                borderRadius: 4,
+            }] },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { 
+                    x: { grid: { display: false } }, 
+                    y: { beginAtZero: true, grid: { color: '#e5e7eb', borderDash: [2, 4] } } 
+                },
+                interaction: { intersect: false, mode: 'index' },
+            }
+        });
+    }
+
+
+    function renderAdminReportsPage() {
+        const container = document.getElementById('page-admin-reports');
+        if (!container) return;
+        
+        container.innerHTML = `<h1 class="text-2xl lg:text-3xl font-bold mb-6 text-gray-800">Laporan Pesanan</h1>
+            <div class="bg-white rounded-lg shadow-lg overflow-x-auto">
+                <table class="w-full text-sm text-left">
+                    <thead class="bg-gray-50 text-xs text-gray-700 uppercase">
+                         <tr>
+                            <th class="p-3">Ruangan & Kegiatan</th>
+                            <th class="p-3">Dipesan Oleh</th>
+                            <th class="p-3">Tanggal</th>
+                            <th class="p-3">Waktu</th>
+                            <th class="p-3">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${bookingsData.map(booking => {
+                            const room = roomsData.find(r => r.id === booking.roomId);
+                            const user = usersData.find(u => u.id === booking.userId);
+                            const status = getBookingStatus(booking);
+                            return `
+                                <tr class="border-b hover:bg-gray-50">
+                                    <td class="p-3 py-4"><p class="font-medium text-gray-800">${room.name}</p><p class="text-xs text-gray-500">${booking.activity}</p></td>
+                                    <td class="p-3 py-4 text-gray-600">${user.name}</td>
+                                    <td class="p-3 py-4 text-gray-600 whitespace-nowrap">${new Date(booking.date).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'})}</td>
+                                    <td class="p-3 py-4 text-gray-600 whitespace-nowrap">${booking.start} - ${booking.end}</td>
+                                    <td class="p-3 py-4"><span class="px-3 py-1 text-xs font-semibold rounded-full ${status.class}">${status.text}</span></td>
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+            </div>`;
+    }
+
+    function renderAdminSchedulePage(scheduleDate, filterType) {
+        const container = document.getElementById('page-admin-schedule');
+        if (!container) return;
+        
+        const timeToMinutes = (time) => { const [hours, minutes] = time.split(':').map(Number); return hours * 60 + minutes; };
+        
+        const filteredRooms = filterType === 'all'  ? roomsData : roomsData.filter(room => room.type === filterType);
+        const bookingsOnDate = bookingsData.filter(b => b.date === scheduleDate && (b.status === 'Disetujui' || b.status === 'Menunggu Persetujuan'));
+        const timeSlots = Array.from({length: 10}, (_, i) => `${String(i + 8).padStart(2, '0')}:00`);
+        
+        let headerHTML = '<th>Jam</th>';
+        headerHTML += filteredRooms.map(room => `<th class="whitespace-nowrap">${room.name}</th>`).join('');
+
+        let bodyHTML = '';
+        const cellStates = {};
+
+        for (const time of timeSlots) {
+            bodyHTML += `<tr><td class="time-col">${time}</td>`;
+            for (const room of filteredRooms) {
+                if (cellStates[`${time}-${room.id}`] === 'spanned') continue;
+
+                const booking = bookingsOnDate.find(b => b.roomId === room.id && b.start === time);
+                if (booking) {
+                    const rowspan = Math.ceil((timeToMinutes(booking.end) - timeToMinutes(booking.start)) / 60) || 1;
+                    for (let i = 1; i < rowspan; i++) {
+                        const nextHour = parseInt(time.split(':')[0]) + i;
+                        if (nextHour < 18) cellStates[`${String(nextHour).padStart(2, '0')}:00-${room.id}`] = 'spanned';
+                    }
+                    const bgColor = booking.status === 'Disetujui' ? 'bg-green-500' : 'bg-orange-400';
+                    bodyHTML += `<td rowspan="${rowspan}" class="booked-cell ${bgColor}" title="${booking.activity} oleh ${usersData.find(u => u.id === booking.userId)?.name || ''}">${booking.activity}</td>`;
+                } else {
+                    bodyHTML += `<td></td>`;
+                }
+            }
+            bodyHTML += `</tr>`;
+        }
+
+        const filtersHTML = `
+            <div class="p-1 bg-gray-200 rounded-lg flex space-x-1">
+                <button data-filter="all" class="filter-btn schedule-filter-btn w-full px-3 py-1 text-sm rounded-md transition-colors ${filterType === 'all' ? 'active' : 'hover:bg-gray-300'}">Semua</button>
+                <button data-filter="Fisik" class="filter-btn schedule-filter-btn w-full px-3 py-1 text-sm rounded-md transition-colors ${filterType === 'Fisik' ? 'active' : 'hover:bg-gray-300'}">Fisik</button>
+                <button data-filter="Digital" class="filter-btn schedule-filter-btn w-full px-3 py-1 text-sm rounded-md transition-colors ${filterType === 'Digital' ? 'active' : 'hover:bg-gray-300'}">Digital</button>
+            </div>
+        `;
+        
+        container.innerHTML = `
+            <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                <h1 class="text-2xl lg:text-3xl font-bold text-gray-800">Jadwal Ruangan</h1>
+                <div class="flex items-center gap-4">
+                    ${filtersHTML}
+                    <input type="date" id="schedule-date-picker" value="${scheduleDate}" class="form-input rounded-lg shadow-sm border-gray-300 focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                </div>
+            </header>
+            <div class="overflow-x-auto bg-white rounded-lg shadow-lg">
+                <table class="schedule-table w-full min-w-[800px]">
+                    <thead><tr>${headerHTML}</tr></thead>
+                    <tbody>${bodyHTML}</tbody>
+                </table>
+            </div>`;
+    }
+
+    // --- Classic Table Renders for Admin ---
+    function renderAdminManageRooms() {
+        const container = document.getElementById('page-admin-manage-rooms');
+        if (!container) return;
+        
+        let tableRowsHTML = roomsData.map(room => `
+            <tr class="border-b hover:bg-gray-50">
+                <td class="p-3 py-4 font-medium text-gray-800">${room.name}</td>
+                <td class="p-3 py-4 text-gray-600">${room.type}</td>
+                <td class="p-3 py-4 text-gray-600">${room.capacity}</td>
+                <td class="p-3 py-4 text-sm text-gray-500">${room.facilities}</td>
+                <td class="p-3 py-4 text-right">
+                    <div class="flex items-center justify-end space-x-2">
+                        <button data-room-id="${room.id}" class="edit-room-btn bg-yellow-500 text-white p-1.5 rounded-md hover:bg-yellow-600 transition-colors"><span class="h-4 w-4 block hero-icon" data-icon="pencil"></span></button>
+                        <button data-room-id="${room.id}" class="delete-room-btn bg-red-600 text-white p-1.5 rounded-md hover:bg-red-700 transition-colors"><span class="h-4 w-4 block hero-icon" data-icon="trash"></span></button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+
+        container.innerHTML = `
+            <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                <h1 class="text-2xl lg:text-3xl font-bold text-gray-800">Manajemen Ruangan</h1>
+                <button class="add-room-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors shadow-md hover:shadow-lg">Tambah Ruangan</button>
+            </header>
+            <div class="bg-white rounded-lg shadow-lg overflow-x-auto">
+                <table class="w-full text-sm text-left">
+                    <thead class="bg-gray-50 text-xs text-gray-700 uppercase">
+                        <tr>
+                            <th class="p-3">Nama</th>
+                            <th class="p-3">Tipe</th>
+                            <th class="p-3">Kap.</th>
+                            <th class="p-3">Fasilitas</th>
+                            <th class="p-3 text-right">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>${tableRowsHTML}</tbody>
+                </table>
+            </div>`;
+    }
+
+    function renderAdminAllBookings() {
+        const container = document.getElementById('page-admin-all-bookings');
+        if (!container) return;
+        
+        const statusOrder = { "Menunggu Persetujuan": 1, "Disetujui": 2, "Ditolak": 3, "Selesai": 4 };
+        const allBookings = [...bookingsData].sort((a, b) => statusOrder[getBookingStatus(a).text] - statusOrder[getBookingStatus(b).text] || new Date(b.date) - new Date(a.date));
+        
+        let tableRowsHTML = allBookings.map(booking => {
+            const room = roomsData.find(r => r.id === booking.roomId);
+            const user = usersData.find(u => u.id === booking.userId);
+            const status = getBookingStatus(booking);
+            let actionButtons = '';
+
+            if (status.text === 'Menunggu Persetujuan') {
+                actionButtons = `
+                    <button data-booking-id="${booking.id}" class="approve-booking-btn bg-green-500 text-white p-1.5 rounded-md hover:bg-green-600 transition-colors flex items-center justify-center" title="Setujui"><span class="h-4 w-4 hero-icon" data-icon="check"></span></button>
+                    <button data-booking-id="${booking.id}" class="reject-booking-btn bg-red-500 text-white p-1.5 rounded-md hover:bg-red-600 transition-colors flex items-center justify-center" title="Tolak"><span class="h-4 w-4 hero-icon" data-icon="x-mark"></span></button>
+                    <a href="#schedule" data-date="${booking.date}" class="view-schedule-btn bg-blue-500 text-white p-1.5 rounded-md hover:bg-blue-600 transition-colors flex items-center justify-center" title="Lihat Jadwal"><span class="h-4 w-4 hero-icon" data-icon="calendar-days"></span></a>
+                `;
+            } else if (status.text === 'Disetujui') {
+                actionButtons = `<button data-booking-id="${booking.id}" class="cancel-booking-btn bg-gray-500 text-white p-1.5 rounded-md hover:bg-gray-600 transition-colors flex items-center justify-center" title="Batalkan"><span class="h-4 w-4 hero-icon" data-icon="trash"></span></button>`;
+            }
+            
+            return `
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="p-3 py-4"><p class="font-medium text-gray-800">${room.name}</p><p class="text-xs text-gray-500">${booking.activity}</p></td>
+                    <td class="p-3 py-4 text-gray-600">${user.name}</td>
+                    <td class="p-3 py-4 text-gray-600 whitespace-nowrap">${new Date(booking.date).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'})}</td>
+                    <td class="p-3 py-4"><span class="px-3 py-1 text-xs font-semibold rounded-full ${status.class}">${status.text}</span></td>
+                    <td class="p-3 py-4"><div class="flex items-center justify-end space-x-2">${actionButtons}</div></td>
+                </tr>
+            `;
+        }).join('');
+
+        container.innerHTML = `
+            <h1 class="text-2xl lg:text-3xl font-bold mb-6 text-gray-800">Manajemen Pesanan</h1>
+            <div class="bg-white rounded-lg shadow-lg overflow-x-auto">
+                <table class="w-full text-sm text-left">
+                    <thead class="bg-gray-50 text-xs text-gray-700 uppercase">
+                        <tr>
+                            <th class="p-3">Ruangan & Kegiatan</th>
+                            <th class="p-3">Dipesan Oleh</th>
+                            <th class="p-3">Tanggal</th>
+                            <th class="p-3">Status</th>
+                            <th class="p-3 text-right">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>${tableRowsHTML}</tbody>
+                </table>
+            </div>`;
+    }
+    
+    // --- Modal Functions ---
+    
+    function showBookingModal(roomId) {
+        const room = roomsData.find(r => r.id === roomId);
+        const modal = document.getElementById('booking-modal');
+        const modalContent = modal.querySelector('.modal-content');
+        const minDate = new Date();
+        minDate.setDate(minDate.getDate() + 1);
+        const minDateString = minDate.toISOString().split('T')[0];
+
+        modalContent.innerHTML = `
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Pesan Ruangan: ${room.name}</h2>
+                <button class="close-modal-btn text-gray-400 hover:text-gray-600 text-3xl leading-none">&times;</button>
+            </div>
+            <form id="booking-form" data-room-id="${roomId}" novalidate>
+                <div class="space-y-4">
+                    <div><label for="activity" class="block text-sm font-medium text-gray-700 mb-1">Nama Kegiatan</label><input type="text" id="activity" name="activity" required class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"></div>
+                    <div><label for="booking-date" class="block text-sm font-medium text-gray-700 mb-1">Tanggal</label><input type="date" id="booking-date" name="booking-date" required min="${minDateString}" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"></div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div><label for="start-time" class="block text-sm font-medium text-gray-700 mb-1">Jam Mulai</label><input type="time" id="start-time" name="start-time" required class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"></div>
+                        <div><label for="end-time" class="block text-sm font-medium text-gray-700 mb-1">Jam Selesai</label><input type="time" id="end-time" name="end-time" required class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"></div>
+                    </div>
+                </div>
+                <div class="mt-8 flex justify-end space-x-3">
+                    <button type="button" class="close-modal-btn bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300 transition-colors font-semibold">Batal</button>
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors font-semibold">Ajukan Pesanan</button>
+                </div>
+            </form>`;
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+
+    function showRoomModal(roomId = null) {
+        const isEdit = roomId !== null;
+        const room = isEdit ? roomsData.find(r => r.id === roomId) : {};
+        const modal = document.getElementById('room-modal');
+        const modalContent = modal.querySelector('.modal-content');
+
+        const title = isEdit ? `Edit Ruangan: ${room.name}` : 'Tambah Ruangan Baru';
+        
+        modalContent.innerHTML = `
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">${title}</h2>
+                <button class="close-modal-btn text-gray-400 hover:text-gray-600 text-3xl leading-none">&times;</button>
+            </div>
+            <form id="room-form" data-room-id="${roomId || ''}" novalidate>
+                <div class="space-y-4">
+                    <div><label for="room-name" class="block text-sm font-medium text-gray-700 mb-1">Nama Ruangan</label><input type="text" id="room-name" name="room-name" required value="${room.name || ''}" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"></div>
+                    <div>
+                        <label for="room-type" class="block text-sm font-medium text-gray-700 mb-1">Tipe</label>
+                        <select id="room-type" name="room-type" required class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="Fisik" ${room.type === 'Fisik' ? 'selected' : ''}>Fisik</option>
+                            <option value="Digital" ${room.type === 'Digital' ? 'selected' : ''}>Digital</option>
+                        </select>
+                    </div>
+                    <div><label for="room-capacity" class="block text-sm font-medium text-gray-700 mb-1">Kapasitas</label><input type="number" id="room-capacity" name="room-capacity" required min="1" value="${room.capacity || ''}" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"></div>
+                    <div><label for="room-facilities" class="block text-sm font-medium text-gray-700 mb-1">Fasilitas (pisahkan dengan koma)</label><input type="text" id="room-facilities" name="room-facilities" required value="${room.facilities || ''}" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"></div>
+                </div>
+                <div class="mt-8 flex justify-end space-x-3">
+                    <button type="button" class="close-modal-btn bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300 transition-colors font-semibold">Batal</button>
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors font-semibold">Simpan</button>
+                </div>
+            </form>`;
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+
+    // --- Data Handling Functions ---
+
+    function createNotification(userId, message) {
+        notificationsData.unshift({
+            userId: userId,
+            message: message,
+            time: 'Baru saja',
+            rawTime: new Date(),
+            read: false
+        });
+        // Simulasi pengiriman email di console
+        console.log(`SIMULASI EMAIL: Kepada=${userId}, Pesan="${message}"`);
+    }
+    
+    function handleBookingSubmit(e) {
+        e.preventDefault();
+        const form = e.target;
+        const roomId = parseInt(form.dataset.roomId);
+        const activity = form.elements['activity'].value.trim();
+        const date = form.elements['booking-date'].value;
+        const start = form.elements['start-time'].value;
+        const end = form.elements['end-time'].value;
+
+        if (!activity || !date || !start || !end) { showCustomAlert('Gagal', 'Semua kolom wajib diisi!', 'error'); return; }
+        if (start >= end) { showCustomAlert('Gagal', 'Jam selesai harus setelah jam mulai!', 'error'); return; }
+
+        const conflict = bookingsData.some(b => b.roomId === roomId && b.date === date && b.status === 'Disetujui' && ((start >= b.start && start < b.end) || (end > b.start && end <= b.end) || (start <= b.start && end >= b.end)));
+        if (conflict) { showCustomAlert('Gagal', 'Ruangan sudah dipesan pada jam tersebut. Silakan pilih waktu lain.', 'error'); return; }
+
+        const newBooking = { id: 'b' + (bookingsData.length + 1).toString().padStart(3, '0'), roomId, userId: currentUser.id, activity, date, start, end, status: 'Menunggu Persetujuan' };
+        bookingsData.push(newBooking);
+
+        createNotification(currentUser.id, `Pengajuan pesanan Anda untuk "${activity}" sedang menunggu persetujuan.`);
+        createNotification('admin01', `Ada pengajuan pesanan baru dari ${currentUser.name} untuk ${roomsData.find(r=>r.id===roomId).name}.`);
+
+        document.getElementById('booking-modal').classList.add('hidden');
+        renderUserDaftarPage();
+        initIcons();
+        showCustomAlert('Berhasil!', `Pengajuan pesanan Anda telah dikirim dan menunggu persetujuan admin.`, 'success', true);
+    }
+
+    function handleRoomFormSubmit(e) {
+        e.preventDefault();
+        const form = e.target;
+        const roomId = form.dataset.roomId ? parseInt(form.dataset.roomId) : null;
+        const name = form.elements['room-name'].value.trim();
+        const type = form.elements['room-type'].value;
+        const capacity = parseInt(form.elements['room-capacity'].value);
+        const facilities = form.elements['room-facilities'].value.trim();
+
+        if (!name || !type || !capacity || !facilities) { showCustomAlert('Gagal', 'Semua kolom wajib diisi!', 'error'); return; }
+        
+        if (roomId) {
+            const roomIndex = roomsData.findIndex(r => r.id === roomId);
+            if (roomIndex > -1) {
+                roomsData[roomIndex] = { ...roomsData[roomIndex], name, type, capacity, facilities };
+                showCustomAlert('Berhasil!', `Data ruangan ${name} telah diperbarui.`);
+            }
+        } else {
+            const newId = roomsData.length > 0 ? Math.max(...roomsData.map(r => r.id)) + 1 : 1;
+            roomsData.push({ id: newId, name, type, capacity, facilities });
+            showCustomAlert('Berhasil!', `Ruangan baru "${name}" telah ditambahkan.`);
+        }
+
+        document.getElementById('room-modal').classList.add('hidden');
+        renderAdminManageRooms();
+        renderAdminDashboard();
+        renderAdminSchedulePage(document.getElementById('schedule-date-picker')?.value || TODAY_DATE.toISOString().split('T')[0], scheduleRoomFilter);
+        initIcons();
+    }
+
+    function handleDeleteRoom(roomId) {
+        const room = roomsData.find(r => r.id === roomId);
+        if (!room) return;
+        roomsData = roomsData.filter(r => r.id !== roomId);
+        bookingsData = bookingsData.filter(b => b.roomId !== roomId);
+        showCustomAlert('Berhasil!', `Ruangan "${room.name}" dan pesanan terkait telah dihapus.`);
+        renderAll();
+    }
+
+    function handleUpdateBookingStatus(bookingId, newStatus) {
+        const bookingIndex = bookingsData.findIndex(b => b.id === bookingId);
+        if (bookingIndex === -1) return;
+        
+        const oldStatus = bookingsData[bookingIndex].status;
+        bookingsData[bookingIndex].status = newStatus;
+        const booking = bookingsData[bookingIndex];
+        const room = roomsData.find(r => r.id === booking.roomId);
+
+        if (newStatus === 'Disetujui' && oldStatus !== 'Disetujui') {
+             createNotification(booking.userId, `Pesanan Anda untuk "${booking.activity}" di ${room.name} telah disetujui.`);
+             showCustomAlert('Berhasil!', `Pesanan telah disetujui.`, 'success', true);
+        } else if (newStatus === 'Ditolak' && oldStatus !== 'Ditolak') {
+            createNotification(booking.userId, `Pesanan Anda untuk "${booking.activity}" di ${room.name} ditolak.`);
+            showCustomAlert('Berhasil!', `Pesanan telah ditolak.`, 'success', true);
+        }
+        
+        renderAdminAllBookings();
+        renderAdminDashboard();
+        renderAdminSchedulePage(document.getElementById('schedule-date-picker')?.value || TODAY_DATE.toISOString().split('T')[0], scheduleRoomFilter); // Refresh schedule
+        initIcons();
+    }
+    
+    function handleCancelBooking(bookingId) {
+        const booking = bookingsData.find(b => b.id === bookingId);
+        if (!booking) return;
+
+        bookingsData = bookingsData.filter(b => b.id !== bookingId);
+        
+        const room = roomsData.find(r => r.id === booking.roomId);
+        createNotification(booking.userId, `Pesanan Anda untuk "${booking.activity}" di ${room.name} telah dibatalkan oleh admin.`);
+        showCustomAlert('Berhasil!', `Pesanan untuk "${room.name}" telah dibatalkan.`, 'success', true);
+
+        renderAll();
+    }
+    
+    // --- Alert and Confirm Modals ---
+
+    function showCustomAlert(title, message, type = 'success', emailNotif = false) {
+        const alertModal = document.getElementById('alert-modal');
+        const alertIcon = document.getElementById('alert-icon');
+        const emailInfo = document.getElementById('alert-email-info');
+        
+        alertIcon.innerHTML = `<svg class="w-16 h-16 ${type === 'success' ? 'text-green-500' : 'text-red-500'}" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">${heroIcons[type === 'success' ? 'check-circle' : 'x-circle']}</svg>`;
+        document.getElementById('alert-title').textContent = title;
+        document.getElementById('alert-message').textContent = message;
+
+        if (emailNotif) {
+            emailInfo.textContent = '(Notifikasi email juga telah dikirimkan)';
+            emailInfo.classList.remove('hidden');
+        } else {
+            emailInfo.classList.add('hidden');
+        }
+
+        alertModal.classList.remove('hidden');
+        alertModal.classList.add('flex');
+        document.getElementById('alert-ok-btn').addEventListener('click', () => { alertModal.classList.add('hidden'); alertModal.classList.remove('flex'); }, { once: true });
+    }
+
+    function showConfirmModal(title, message, onConfirm, buttonText = 'Ya, Lanjutkan', buttonClass = 'bg-red-600 hover:bg-red-700') {
+        const confirmModal = document.getElementById('confirm-modal');
+        document.getElementById('confirm-title').textContent = title;
+        document.getElementById('confirm-message').textContent = message;
+        document.getElementById('confirm-icon').innerHTML = `<svg class="w-16 h-16 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">${heroIcons['question-mark-circle']}</svg>`;
+        
+        const okBtn = document.getElementById('confirm-ok-btn');
+        okBtn.textContent = buttonText;
+        okBtn.className = `text-white px-6 py-2 rounded-md font-semibold transition-colors duration-200 ${buttonClass}`;
+
+        confirmModal.classList.remove('hidden');
+        confirmModal.classList.add('flex');
+
+        const cancelBtn = document.getElementById('confirm-cancel-btn');
+        
+        const close = () => { confirmModal.classList.add('hidden'); confirmModal.classList.remove('flex'); cleanListeners(); };
+        const handleConfirm = () => { onConfirm(); close(); };
+        const cleanListeners = () => {
+            cancelBtn.removeEventListener('click', close);
+            okBtn.removeEventListener('click', handleConfirm);
+        }
+
+        cancelBtn.addEventListener('click', close, { once: true });
+        okBtn.addEventListener('click', handleConfirm, { once: true });
+    }
+    
+    function setupSidebarToggle(menuBtn, sidebar, overlay) {
+        menuBtn.addEventListener('click', (e) => { e.stopPropagation(); sidebar.classList.remove('-translate-x-full'); overlay.classList.remove('hidden'); });
+        overlay.addEventListener('click', () => { sidebar.classList.add('-translate-x-full'); overlay.classList.add('hidden'); });
+    }
+
+    // =================================================================
+    // 3. EVENT LISTENERS & INITIALIZATION
+    // =================================================================
+    
+    document.addEventListener('click', (e) => {
+        // --- Login & Logout ---
+        if (e.target.matches('#login-user')) login('user');
+        if (e.target.matches('#login-admin')) login('admin');
+        if (e.target.matches('#logout-btn-user') || e.target.matches('#logout-btn-admin')) {
+             showConfirmModal('Konfirmasi Logout', 'Apakah Anda yakin ingin keluar?', logout);
+        }
+
+        // --- Navigation ---
+        const userNavLink = e.target.closest('.user-nav a');
+        if (userNavLink) { e.preventDefault(); navigate('user', userNavLink.hash.substring(1)); }
+        
+        const adminNavLink = e.target.closest('.admin-nav a');
+        if (adminNavLink) { 
+             e.preventDefault(); 
+             if(e.target.closest('.view-schedule-btn')) {
+                 const scheduleDate = e.target.closest('.view-schedule-btn').dataset.date;
+                 renderAdminSchedulePage(scheduleDate, scheduleRoomFilter);
+             }
+             navigate('admin', adminNavLink.hash.substring(1)); 
+        }
+
+        // --- Button Actions ---
+        const button = e.target.closest('button');
+        if (!button) return;
+
+        if (button.matches('.schedule-filter-btn')) {
+            scheduleRoomFilter = button.dataset.filter;
+            const currentDate = document.getElementById('schedule-date-picker').value;
+            renderAdminSchedulePage(currentDate, scheduleRoomFilter);
+        } else if (button.closest('#report-date-filters')) {
+             reportDateRange = parseInt(button.dataset.range);
+             renderAdminDashboard();
+             initIcons();
+        } else if (button.closest('#report-type-filters')) {
+            reportRoomFilter = button.dataset.typeFilter;
+            renderAdminDashboard();
+            initIcons();
+        }
+
+        const bookingId = button.dataset.bookingId;
+        const roomId = button.dataset.roomId;
+
+        if (button.matches('.open-booking-modal-btn')) {
+            showBookingModal(parseInt(roomId));
+        } else if (button.matches('.add-room-btn')) {
+            showRoomModal();
+        } else if (button.matches('.edit-room-btn')) {
+            showRoomModal(parseInt(roomId));
+        } else if (button.matches('.delete-room-btn')) {
+            const room = roomsData.find(r => r.id === parseInt(roomId));
+            showConfirmModal('Konfirmasi Hapus', `Yakin ingin menghapus "${room.name}"? Semua pesanan terkait akan ikut terhapus.`, () => handleDeleteRoom(parseInt(roomId)));
+        } else if (button.matches('.approve-booking-btn')) {
+            handleUpdateBookingStatus(bookingId, 'Disetujui');
+        } else if (button.matches('.reject-booking-btn')) {
+            handleUpdateBookingStatus(bookingId, 'Ditolak');
+        } else if (button.matches('.cancel-booking-btn')) {
+             showConfirmModal('Konfirmasi Pembatalan', 'Yakin ingin membatalkan pesanan ini? Aksi ini akan memberitahu pengguna.', () => handleCancelBooking(bookingId));
+        } else if (button.matches('.close-modal-btn')) {
+            button.closest('.modal').classList.add('hidden');
+            button.closest('.modal').classList.remove('flex');
+        }
+    });
+
+    document.addEventListener('change', (e) => {
+        if (e.target.matches('#schedule-date-picker')) {
+            renderAdminSchedulePage(e.target.value, scheduleRoomFilter);
+        }
+    });
+
+    document.addEventListener('submit', (e) => {
+        const formId = e.target.id;
+        if (formId === 'booking-form' || formId === 'room-form') {
+            e.preventDefault();
+            if (formId === 'booking-form') handleBookingSubmit(e);
+            if (formId === 'room-form') handleRoomFormSubmit(e);
+        }
+    });
+
+    setupSidebarToggle(userMenuBtn, userSidebar, sidebarOverlay);
+    setupSidebarToggle(adminMenuBtn, adminSidebar, sidebarOverlay);
+
+    initIcons();
+});
+</script>
+
+</body>
+</html>
