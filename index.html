@@ -84,7 +84,7 @@
 </head>
 <body class="bg-gray-100 antialiased">
 
-    <!-- === LAYAR LOGIN === -->
+    <!-- === LAYAR LOGIN=== -->
     <div id="login-screen" class="active items-center justify-center h-screen w-screen p-4">
         <div class="bg-white p-8 sm:p-10 rounded-xl shadow-2xl text-center max-w-md w-full transition-all">
             <div class="mx-auto mb-6 h-16 w-16 flex items-center justify-center rounded-full bg-blue-100">
@@ -93,13 +93,113 @@
             <h1 class="text-2xl font-bold text-blue-900 mb-4">Layanan Pemesanan Ruangan Rapat Fisik dan Digital</h1>
             <p class="text-gray-600 mb-8">Silakan masuk sesuai peran Anda</p>
             <div class="space-y-4">
-                <button id="login-user" class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg">
-                    Masuk sebagai ASN
+                <button id="login-asn" class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg">
+                    Masuk menggunakan SSO ASN
                 </button>
-                <button id="login-admin" class="w-full bg-gray-800 text-white py-3 rounded-lg font-semibold hover:bg-gray-900 transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg">
-                    Masuk sebagai Admin
+                <button id="login-publik" class="w-full bg-gray-800 text-white py-3 rounded-lg font-semibold hover:bg-gray-900 transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg">
+                    Masuk Menggunakan SSO Publik
                 </button>
             </div>
+        </div>
+    </div>
+
+    <!-- === FORM LOGIN ASN === -->
+    <div id="form-login-asn" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-xl w-full max-w-md shadow-lg text-center">
+            
+            <!-- Gambar -->
+            <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" 
+                alt="Login Icon" 
+                class="w-20 h-20 mx-auto mb-4">
+
+            <!-- Judul -->
+            <h2 class="text-2xl font-bold mb-4 text-blue-800">Login ASN</h2>
+
+            <!-- isi -->
+            <h4 class="mb-4 text-gray-400">Silahkan Masukan NIP dan Password Anda</h4>
+
+            <!-- Form -->
+            <form id="asn-login-form" class="text-left">
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-1">NIP</label>
+                    <input type="text" id="nip" name="nip" 
+                        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500" 
+                        placeholder="Masukkan NIP" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-1">Password</label>
+                    <input type="password" id="password" name="password" 
+                        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500" 
+                        placeholder="Masukkan Password" required>
+                </div>
+                <div class="flex justify-end gap-2">
+                    <button type="button" id="asn-cancel-btn" 
+                            class="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400 transition">Batal</button>
+                    <button type="button" id="asn-submit-btn" 
+                            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Login</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- === FORM PILIH ROLE === -->
+    <div id="form-pilih-role" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white p-8 sm:p-10 rounded-xl shadow-2xl text-center max-w-md w-full transition-all">
+                <div class="mx-auto mb-6 h-16 w-16 flex items-center justify-center rounded-full bg-blue-100">
+                    <span class="h-8 w-8 hero-icon text-blue-600" data-icon="calendar-days"></span>
+                </div>
+                <h1 class="text-2xl font-bold text-blue-900 mb-4">Pilih Role Anda</h1>
+                <p class="text-gray-600 mb-8">Silakan pilih role Anda</p>
+                <div class="space-y-4">
+                    <button id="role-superadmin" class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg">
+                        Superadmin
+                    </button>
+                    <button id="role-admin" class="w-full bg-green-800 text-white py-3 rounded-lg font-semibold hover:bg-green-900 transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg">
+                        Admin
+                    </button>
+                    <button id="role-pengguna" class="w-full bg-gray-800 text-white py-3 rounded-lg font-semibold hover:bg-gray-900 transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg">
+                    Pengguna
+                    </button>
+                </div>
+            </div>
+    </div>
+
+    <!-- === FORM LOGIN PUBLIK === -->
+    <div id="form-login-publik" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-xl w-full max-w-md shadow-lg text-center">
+            
+            <!-- Gambar -->
+            <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" 
+                alt="Login Icon" 
+                class="w-20 h-20 mx-auto mb-4">
+
+            <!-- Judul -->
+            <h2 class="text-2xl font-bold mb-4 text-blue-800">Login Publik</h2>
+
+            <!-- isi -->
+            <h4 class="mb-4 text-gray-400">Silahkan Masukan Email dan Password Anda</h4>
+
+            <!-- Form -->
+            <form id="publik-login-form" class="text-left">
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-1">Email</label>
+                    <input type="text" id="email" name="email" 
+                        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500" 
+                        placeholder="Masukkan Email" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-1">Password</label>
+                    <input type="password" id="password" name="password" 
+                        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500" 
+                        placeholder="Masukkan Password" required>
+                </div>
+                <div class="flex justify-end gap-2">
+                    <button type="button" id="publik-cancel-btn" 
+                            class="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400 transition">Batal</button>
+                    <button type="button" id="publik-submit-btn" 
+                            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Login</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -1385,9 +1485,71 @@ ${diagramSyntax}
     // =================================================================
     
     document.addEventListener('click', (e) => {
-        // --- Login & Logout ---
-        if (e.target.matches('#login-user')) login('user');
-        if (e.target.matches('#login-admin')) login('admin');
+    
+        // Tampilkan form login ASN
+        if (e.target.matches('#login-asn')) {
+            e.preventDefault();
+   
+            document.getElementById('nip').value = '1234567890';
+            document.getElementById('password').value = 'admin';
+         
+            document.getElementById('form-login-asn').classList.remove('hidden');
+        }
+
+        if (e.target.matches('#asn-cancel-btn')) {
+            document.getElementById('form-login-asn').classList.add('hidden');
+        }
+
+        if (e.target.matches('#asn-submit-btn')) {
+            const nip = document.getElementById('nip').value.trim();
+            const password = document.getElementById('password').value.trim();
+
+            if (!nip || !password) {
+                alert('NIP dan Password harus diisi!');
+                return;
+            }
+
+            // Dummy check
+            if (nip === '1234567890' && password === 'admin') {
+                window.userId = 101; // ID user dummy
+                document.getElementById('form-login-asn').classList.add('hidden');
+                document.getElementById('form-pilih-role').classList.remove('hidden');
+            } else {
+                alert('Login gagal. Gunakan NIP: 1234567890 dan Password: admin');
+            }
+        }
+        
+        if (e.target.matches('#role-admin')) {
+            document.getElementById('form-pilih-role').classList.add('hidden');
+            login('admin');
+        }
+
+        if (e.target.matches('#role-superadmin')) {
+            document.getElementById('form-pilih-role').classList.add('hidden');
+            login('admin'); 
+        }
+
+        if (e.target.matches('#role-pengguna')) {
+            document.getElementById('form-pilih-role').classList.add('hidden');
+            login('user');
+        }
+        
+        // Tampilkan form login Publik
+        if (e.target.matches('#login-publik')) {
+            e.preventDefault();
+            document.getElementById('form-login-publik').classList.remove('hidden');
+        }
+
+        if (e.target.matches('#publik-cancel-btn')) {
+            document.getElementById('form-login-publik').classList.add('hidden');
+        }
+
+        if (e.target.matches('#publik-submit-btn')) {
+            document.getElementById('form-login-publik').classList.add('hidden');
+            login('user');
+        }
+
+       
         if (e.target.matches('#logout-btn-user') || e.target.matches('#logout-btn-admin')) {
              showConfirmModal('Konfirmasi Logout', 'Apakah Anda yakin ingin keluar?', logout);
         }
@@ -1462,6 +1624,7 @@ ${diagramSyntax}
         }
     });
 
+    
     document.addEventListener('change', (e) => {
         if (e.target.matches('#schedule-date-picker')) {
             renderAdminSchedulePage(e.target.value, scheduleRoomFilter);
