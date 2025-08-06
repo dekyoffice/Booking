@@ -334,6 +334,23 @@
         </div>
     </div>
 
+   <!-- Modal Upload File -->
+    <div id="upload-file-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
+            <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-gray-800">Upload Dokumen Pendukung</h2>
+            <button class="close-upload-btn text-gray-400 hover:text-gray-600 text-3xl leading-none">&times;</button>
+            </div>
+
+            <form id="upload-file-form">
+            <input type="file" id="support-file" name="support-file" accept=".pdf,.doc,.docx,.jpg,.png" required class="mb-4 block w-full">
+            <div class="flex justify-end space-x-3">
+                <button type="button" class="close-upload-btn bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300">Batal</button>
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-green-700">Kirim</button>
+            </div>
+            </form>
+        </div>
+    </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
@@ -967,7 +984,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('upload-modal-close').addEventListener('click', () => {
             document.getElementById('upload-success-modal').classList.add('hidden');
         });
-}
+    }
 
     function renderUserNotifikasiPage() {
         const container = document.getElementById('page-user-notifikasi');
@@ -1399,12 +1416,14 @@ ${diagramSyntax}
     
     // --- Modal Functions ---
     
+   let pendingBookingData = null;
+
     function showBookingModal(roomIdOrArray, selectedDate = null) {
         const roomIds = Array.isArray(roomIdOrArray) ? roomIdOrArray : [roomIdOrArray];
         const selectedRooms = roomsData.filter(r => roomIds.includes(r.id));
         const modal = document.getElementById('booking-modal');
         const modalContent = modal.querySelector('.modal-content');
-        
+
         const minDate = new Date();
         minDate.setDate(minDate.getDate() + 1);
         const minDateString = minDate.toISOString().split('T')[0];
@@ -1438,43 +1457,39 @@ ${diagramSyntax}
                     <div>
                         <label for="activity" class="block text-sm font-medium text-gray-700 mb-1">Nama Kegiatan</label>
                         <input type="text" id="activity" name="activity" required 
-                            class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
-                                focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
                     <div>
                         <label for="booking-date" class="block text-sm font-medium text-gray-700 mb-1">Tanggal</label>
                         <input type="date" id="booking-date" name="booking-date" required min="${minDateString}" 
                             value="${dateToUse}" ${selectedDate ? 'readonly' : ''} 
                             class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
-                                focus:outline-none focus:ring-2 focus:ring-blue-500 ${selectedDate ? 'bg-gray-100' : ''}">
+                            focus:outline-none focus:ring-2 focus:ring-blue-500 ${selectedDate ? 'bg-gray-100' : ''}">
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label for="start-time" class="block text-sm font-medium text-gray-700 mb-1">Jam Mulai</label>
                             <input type="time" id="start-time" name="start-time" required 
-                                class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
-                                    focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                         </div>
                         <div>
                             <label for="end-time" class="block text-sm font-medium text-gray-700 mb-1">Jam Selesai</label>
                             <input type="time" id="end-time" name="end-time" required 
-                                class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
-                                    focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                         </div>
                     </div>
-                    <!-- Kolom Keterangan -->
                     <div>
                         <label for="notes" class="block text-sm font-medium text-gray-700 mb-1">Keterangan</label>
                         <textarea id="notes" name="notes" rows="3"
                             class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
-                                focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            focus:outline-none focus:ring-2 focus:ring-blue-500"
                             placeholder="Tambahkan keterangan tambahan..."></textarea>
                     </div>
                     ${infoHTML}
                 </div>
                 <div class="mt-8 flex justify-end space-x-3">
-                    <button type="button" class="close-modal-btn bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300 transition-colors font-semibold" data-back-room="${roomIds[0]}">Batal</button>
-                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors font-semibold">Ajukan Pesanan</button>
+                    <button type="button" class="close-modal-btn bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300 font-semibold" data-back-room="${roomIds[0]}">Batal</button>
+                    <button type="button" id="next-upload-btn" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 font-semibold">Lanjutkan & Upload File</button>
                 </div>
             </form>
         `;
@@ -1482,16 +1497,164 @@ ${diagramSyntax}
         modal.classList.remove('hidden');
         modal.classList.add('flex');
 
-        // Event Batal → kembali ke kalender
+        // Tutup modal booking
         modal.querySelectorAll('.close-modal-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 modal.classList.add('hidden');
                 modal.classList.remove('flex');
-                const roomId = btn.getAttribute('data-back-room');
-                if (roomId) {
-                    showCalendarModal(parseInt(roomId)); // kembali ke kalender ruangan pertama
+            });
+        });
+
+        // Klik Lanjutkan → buka modal upload file
+        document.getElementById('next-upload-btn').addEventListener('click', () => {
+            const bookingForm = document.getElementById('booking-form');
+            if (!bookingForm.checkValidity()) {
+                bookingForm.reportValidity();
+                return;
+            }
+
+            // Simpan data booking sementara
+            pendingBookingData = {
+                roomIds: roomIds,
+                activity: bookingForm.querySelector('#activity').value,
+                date: bookingForm.querySelector('#booking-date').value,
+                start: bookingForm.querySelector('#start-time').value,
+                end: bookingForm.querySelector('#end-time').value,
+                notes: bookingForm.querySelector('#notes').value
+            };
+
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+
+            // Tampilkan modal upload file
+            document.getElementById('upload-file-modal').classList.remove('hidden');
+            document.getElementById('upload-file-modal').classList.add('flex');
+        });
+    }
+
+    // ==========================
+    // Event Modal Upload File
+    // ==========================
+    document.querySelectorAll('.close-upload-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.getElementById('upload-file-modal').classList.add('hidden');
+            document.getElementById('upload-file-modal').classList.remove('flex');
+        });
+    });
+
+    document.getElementById('upload-file-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const fileInput = document.getElementById('support-file');
+        if (!fileInput.files.length) {
+            alert('Pilih file terlebih dahulu.');
+            return;
+        }
+
+        // Simpan form + file (opsional kirim ke server)
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+        if (pendingBookingData) {
+            Object.keys(pendingBookingData).forEach(key => {
+                if (key === 'roomIds') {
+                    formData.append(key, JSON.stringify(pendingBookingData[key]));
+                } else {
+                    formData.append(key, pendingBookingData[key]);
                 }
             });
+        }
+
+        // Tutup modal upload
+        document.getElementById('upload-file-modal').classList.add('hidden');
+        document.getElementById('upload-file-modal').classList.remove('flex');
+
+        // Tampilkan modal sukses
+        document.getElementById('upload-file-name').textContent = `File "${fileInput.files[0].name}" berhasil diunggah.`;
+        document.getElementById('upload-success-modal').classList.remove('hidden');
+        document.getElementById('upload-success-modal').classList.add('flex');
+
+        // Reset data booking
+        pendingBookingData = null;
+    });
+
+    // ==========================
+    // Event Modal Sukses Upload
+    // ==========================
+    document.getElementById('upload-modal-close').addEventListener('click', () => {
+        document.getElementById('upload-success-modal').classList.add('hidden');
+        document.getElementById('upload-success-modal').classList.remove('flex');
+    });
+
+    // Modal upload file
+    function openUploadFileModal(roomIds) {
+        const uploadModal = document.getElementById('upload-file-modal');
+        const content = uploadModal.querySelector('.modal-content');
+
+        content.innerHTML = `
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Upload Dokumen Pendukung</h2>
+                <button class="close-upload-btn text-gray-400 hover:text-gray-600 text-3xl leading-none">&times;</button>
+            </div>
+            <form id="upload-file-form" data-room-id="${roomIds.join(',')}">
+                <input type="file" id="support-file" name="support-file" accept=".pdf,.doc,.docx,.jpg,.png" required class="mb-4 block w-full">
+                <div class="flex justify-end space-x-3">
+                    <button type="button" class="close-upload-btn bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300">Batal</button>
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-green-700">Kirim Pesanan</button>
+                </div>
+            </form>
+        `;
+
+        uploadModal.classList.remove('hidden');
+        uploadModal.classList.add('flex');
+
+        // Tutup modal upload
+        uploadModal.querySelectorAll('.close-upload-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                uploadModal.classList.add('hidden');
+                uploadModal.classList.remove('flex');
+            });
+        });
+
+        // Submit form upload
+        document.getElementById('upload-file-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const fileInput = document.getElementById('support-file');
+            if (!fileInput.files.length) {
+                alert('Pilih file terlebih dahulu.');
+                return;
+            }
+
+            // Gabungkan data booking & file
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            if (pendingBookingData) {
+                Object.keys(pendingBookingData).forEach(key => {
+                    if (key === 'roomIds') {
+                        formData.append(key, JSON.stringify(pendingBookingData[key]));
+                    } else {
+                        formData.append(key, pendingBookingData[key]);
+                    }
+                });
+            }
+
+            // Tutup modal upload
+            uploadModal.classList.add('hidden');
+            uploadModal.classList.remove('flex');
+
+            // Tampilkan modal sukses
+            const successModal = document.getElementById('upload-success-modal');
+            const fileName = fileInput.files[0].name;
+            document.getElementById('upload-file-name').textContent = `File "${fileName}" berhasil diunggah.`;
+            successModal.classList.remove('hidden');
+            successModal.classList.add('flex');
+
+            // Tombol OK di modal sukses
+            document.getElementById('upload-modal-close').addEventListener('click', () => {
+                successModal.classList.add('hidden');
+                successModal.classList.remove('flex');
+            });
+
+            // Reset data
+            pendingBookingData = null;
         });
     }
 
