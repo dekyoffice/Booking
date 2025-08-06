@@ -741,24 +741,34 @@ document.addEventListener('DOMContentLoaded', () => {
         modal.classList.add('flex');
     }
 
-    function renderUserDaftarPage() {
+  function renderUserDaftarPage() {
     const container = document.getElementById('page-user-daftar');
     if (!container) return;
     const todayString = TODAY_DATE.toISOString().split('T')[0];
     const todayFormatted = TODAY_DATE.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
     let searchQuery = '';
+    let selectedDinas = '';
+
+    // Ambil daftar dinas unik dari roomsData
+    const dinasList = [...new Set(roomsData.map(r => r.dinas).filter(Boolean))];
 
     function renderRoomList() {
         let filteredRooms = roomsData
-            .filter(room => !room.hidden) // ⬅ Tambahkan filter agar yang hidden tidak tampil
+            .filter(room => !room.hidden) // hide ruangan yang disembunyikan
             .filter(room => {
                 const q = searchQuery.toLowerCase();
+                const dinasMatch = selectedDinas === '' || 
+                                   (room.dinas && room.dinas.toLowerCase().includes(selectedDinas.toLowerCase()));
+
                 return (
-                    room.name.toLowerCase().includes(q) ||
-                    room.type.toLowerCase().includes(q) ||
-                    String(room.capacity).includes(q) ||
-                    (room.dinas && room.dinas.toLowerCase().includes(q))
+                    dinasMatch &&
+                    (
+                        room.name.toLowerCase().includes(q) ||
+                        room.type.toLowerCase().includes(q) ||
+                        String(room.capacity).includes(q) ||
+                        (room.dinas && room.dinas.toLowerCase().includes(q))
+                    )
                 );
             });
 
@@ -823,14 +833,26 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // HTML utama
     container.innerHTML = `
         <h1 class="text-2xl lg:text-3xl font-bold mb-6 text-gray-800">Daftar Ruangan Rapat</h1>
-        <div class="mb-4 flex justify-end">
+        <div class="mb-4 flex justify-end gap-2">
             <div class="relative w-full sm:w-80">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">🔍</span>
-                <input type="text" id="search-room" placeholder="Cari ruangan..." class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                <input type="text" id="search-room" placeholder="Cari ruangan..." 
+                    class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            </div>
+            <!-- Dropdown Filter Dinas -->
+            <div class="relative w-full sm:w-56">
+                <input type="text" id="filter-dinas" placeholder="Cari dinas..."
+                    list="dinas-list"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                <datalist id="dinas-list">
+                    ${dinasList.map(d => `<option value="${d}"></option>`).join('')}
+                </datalist>
             </div>
         </div>
+
         <section id="room-list-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-20"></section>
         <div id="multi-booking-bar" class="hidden fixed bottom-0 left-0 w-full bg-blue-700 p-4">
             <button id="multi-booking-btn" class="open-room-calendar-btn w-full bg-blue-600 hover:bg-blue-700 px-4 py-3 rounded text-white text-lg font-semibold">
@@ -839,13 +861,22 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
     `;
 
+    // Event search
     document.getElementById('search-room').addEventListener('input', (e) => {
         searchQuery = e.target.value;
         renderRoomList();
     });
 
+    // Event filter dinas
+    document.getElementById('filter-dinas').addEventListener('input', (e) => {
+        selectedDinas = e.target.value;
+        renderRoomList();
+    });
+
+    // Render awal
     renderRoomList();
 
+    // Event tombol "Pesan Sekaligus"
     document.getElementById('multi-booking-btn').addEventListener('click', () => {
         const selectedIds = Array.from(document.querySelectorAll('.room-select:checked')).map(cb => parseInt(cb.value));
         if (selectedIds.length > 0) {
