@@ -8,6 +8,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <style>
@@ -80,6 +82,7 @@
             color: #f59e0b; /* amber-500 */
         }
         .star-rating input { display: none; }
+        
     </style>
 </head>
 <body class="bg-gray-100 antialiased">
@@ -338,7 +341,7 @@
     <div id="upload-file-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center">
         <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
             <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-bold text-gray-800">Upload Dokumen Pendukung</h2>
+            <h2 class="text-2xl font-bold text-gray-800">Upload Dokumen Pendukung Tengkawang</h2>
             <button class="close-upload-btn text-gray-400 hover:text-gray-600 text-3xl leading-none">&times;</button>
             </div>
 
@@ -352,6 +355,39 @@
         </div>
     </div>
 
+    <!-- Modal Kalender Admin -->
+    <div id="calendarModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-lg p-6 relative">
+            <h2 class="text-xl font-semibold mb-4">Blokir Tanggal</h2>
+            <div id="calendar"></div>
+            <button id="closeCalendarModal" class="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-xl">&times;</button>
+        </div>
+    </div>
+
+    <!-- Modal Pilihan Waktu -->
+    <div id="timeSelectionModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white p-6 rounded-md shadow-md w-72 text-center">
+            <h2 class="text-lg font-semibold mb-4">Pilih Waktu Blokir</h2>
+            <div class="flex flex-col gap-3">
+            <button data-time="08:00:00" data-label="Pagi" class="select-time-btn bg-blue-100 hover:bg-blue-200 text-blue-800 font-semibold py-2 rounded">🌅 Pagi (08:00)</button>
+            <button data-time="13:00:00" data-label="Siang" class="select-time-btn bg-yellow-100 hover:bg-yellow-200 text-yellow-800 font-semibold py-2 rounded">☀️ Siang (13:00)</button>
+            <button data-time="19:00:00" data-label="Malam" class="select-time-btn bg-purple-100 hover:bg-purple-200 text-purple-800 font-semibold py-2 rounded">🌙 Malam (19:00)</button>
+            </div>
+            <button id="cancelTimeSelection" class="mt-5 text-sm text-gray-500 hover:text-gray-700">Batal</button>
+        </div>
+    </div>
+
+    <!-- Modal Konfirmasi Batalkan Blokiran -->
+    <div id="confirmUnblockModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white p-6 rounded-md shadow-md w-96 text-center">
+            <h2 class="text-lg font-semibold mb-4 text-red-600">Batalkan Blokiran?</h2>
+            <p id="unblockModalText" class="text-gray-700 mb-6"></p>
+            <div class="flex justify-center gap-4">
+            <button id="confirmUnblockBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">Ya, Batalkan</button>
+            <button id="cancelUnblockBtn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded">Batal</button>
+            </div>
+        </div>
+    </div>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     
@@ -1325,6 +1361,11 @@ ${diagramSyntax}
                         </span>
                     </label>
                 </td>
+                <td class="p-3 text-center">
+                    <span data-room-id="${room.id}" class="block-calendar-btn cursor-pointer inline-block bg-purple-600 text-white px-2 py-1 rounded hover:bg-purple-700 transition-colors text-xs">
+                       <i class="hero-icon" data-icon="calendar-x-mark">📅</i>
+                    </span>
+                </td>
                 <td class="p-3 py-4 text-right">
                     <div class="flex items-center justify-end space-x-2">
                         <button data-room-id="${room.id}" class="edit-room-btn bg-yellow-500 text-white p-1.5 rounded-md hover:bg-yellow-600 transition-colors">
@@ -1333,6 +1374,7 @@ ${diagramSyntax}
                         <button data-room-id="${room.id}" class="delete-room-btn bg-red-600 text-white p-1.5 rounded-md hover:bg-red-700 transition-colors">
                             <span class="h-4 w-4 block hero-icon" data-icon="trash"></span>
                         </button>
+                        <!-- Tombol Blokir Kalender -->
                     </div>
                 </td>
             </tr>
@@ -1355,13 +1397,101 @@ ${diagramSyntax}
                             <th class="p-3">Dinas</th>
                             <th class="p-3">Fasilitas</th>
                             <th class="p-3">Tampil</th>
+                            <th class="p-3">Blokir Tanggal</th>
                             <th class="p-3 text-right">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>${tableRowsHTML}</tbody>
                 </table>
             </div>`;
+
+        // Tambahkan event listener untuk tombol blokir kalender
+        document.addEventListener('click', function (e) {
+            const icon = e.target.closest('.block-calendar-btn');
+            if (icon) {
+                const roomId = icon.dataset.roomId;
+                showAdminCalendarModal(roomId); // GANTI DENGAN INI
+            }
+        });
     }
+   
+    function showAdminCalendarModal(roomId = null) {
+        currentCalendarRoomId = roomId;
+        renderAdminCalendarInModal(roomId);
+        const modal = document.getElementById('admin-calendar-modal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+
+    function renderAdminCalendarInModal(roomId = null) {
+        const modal = document.getElementById('admin-calendar-modal');
+        const container = modal.querySelector('.modal-content');
+        if (!container) return;
+
+        const room = roomId ? roomsData.find(r => r.id === roomId) : null;
+        const monthName = calendarDate.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
+
+        let headerHTML = `
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">${room ? `Blokir Kalender - ${room.name}` : 'Blokir Kalender'}</h2>
+                <div class="flex items-center space-x-2">
+                    <button id="admin-calendar-prev-month-btn" class="p-2 rounded-full hover:bg-gray-200 transition-colors">&lt;</button>
+                    <span class="text-lg font-semibold text-gray-700 w-48 text-center">${monthName}</span>
+                    <button id="admin-calendar-next-month-btn" class="p-2 rounded-full hover:bg-gray-200 transition-colors">&gt;</button>
+                </div>
+                <button class="close-admin-modal-btn text-gray-400 hover:text-gray-600 text-3xl leading-none">&times;</button>
+            </div>
+        `;
+
+        const year = calendarDate.getFullYear();
+        const month = calendarDate.getMonth();
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        const daysInMonth = lastDay.getDate();
+        let startDayIndex = firstDay.getDay();
+
+        const weekdays = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+        let gridHTML = `<div class="grid grid-cols-7 gap-px bg-gray-200 border border-gray-200 rounded-lg shadow-sm overflow-hidden">`;
+        gridHTML += weekdays.map(day => `<div class="text-center font-semibold text-xs py-3 bg-gray-50 text-gray-500 uppercase tracking-wider">${day}</div>`).join('');
+
+        for (let i = 0; i < startDayIndex; i++) {
+            gridHTML += `<div class="bg-gray-50 min-h-[100px]"></div>`;
+        }
+
+        for (let day = 1; day <= daysInMonth; day++) {
+            const date = new Date(year, month, day);
+            const dateString = date.toISOString().split('T')[0];
+
+            gridHTML += `
+                <div class="p-2 min-h-[100px] bg-white relative cursor-pointer hover:bg-red-50 transition-colors" data-date="${dateString}">
+                    <div class="flex justify-end">
+                        <span class="h-6 w-6 flex items-center justify-center rounded-full text-sm font-semibold text-gray-800">${day}</span>
+                    </div>
+                    <div class="mt-2 text-xs text-blue-600 font-medium text-center">Klik untuk Blokir</div>
+                </div>
+            `;
+        }
+
+        gridHTML += '</div>';
+        container.innerHTML = headerHTML + gridHTML;
+
+        // Event klik tanggal
+        container.querySelectorAll('[data-date]').forEach(cell => {
+            cell.addEventListener('click', () => {
+                const date = cell.getAttribute('data-date');
+                if (roomId && date) {
+                    openBlockDateForm(roomId, date); // <- Fungsi untuk blokir tanggal
+                }
+            });
+        });
+
+        // Tombol close
+        container.querySelector('.close-admin-modal-btn').addEventListener('click', () => {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        });
+    }
+
     function renderAdminAllBookings() {
         const container = document.getElementById('page-admin-all-bookings');
         if (!container) return;
@@ -1589,10 +1719,20 @@ ${diagramSyntax}
         const uploadModal = document.getElementById('upload-file-modal');
         const content = uploadModal.querySelector('.modal-content');
 
+        // Ambil nama-nama ruangan berdasarkan ID dari roomsData
+        const roomNames = roomIds.map(id => {
+            const room = roomsData.find(r => r.id === parseInt(id));
+            return room ? room.name : `Ruangan ID ${id}`;
+        });
+
         content.innerHTML = `
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-2xl font-bold text-gray-800">Upload Dokumen Pendukung</h2>
                 <button class="close-upload-btn text-gray-400 hover:text-gray-600 text-3xl leading-none">&times;</button>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Nama Ruangan</label>
+                <p class="text-gray-800 font-semibold">${roomNames.join(', ')}</p>
             </div>
             <form id="upload-file-form" data-room-id="${roomIds.join(',')}">
                 <input type="file" id="support-file" name="support-file" accept=".pdf,.doc,.docx,.jpg,.png" required class="mb-4 block w-full">
@@ -1623,7 +1763,6 @@ ${diagramSyntax}
                 return;
             }
 
-            // Gabungkan data booking & file
             const formData = new FormData();
             formData.append('file', fileInput.files[0]);
             if (pendingBookingData) {
@@ -1636,24 +1775,20 @@ ${diagramSyntax}
                 });
             }
 
-            // Tutup modal upload
             uploadModal.classList.add('hidden');
             uploadModal.classList.remove('flex');
 
-            // Tampilkan modal sukses
             const successModal = document.getElementById('upload-success-modal');
             const fileName = fileInput.files[0].name;
             document.getElementById('upload-file-name').textContent = `File "${fileName}" berhasil diunggah.`;
             successModal.classList.remove('hidden');
             successModal.classList.add('flex');
 
-            // Tombol OK di modal sukses
             document.getElementById('upload-modal-close').addEventListener('click', () => {
                 successModal.classList.add('hidden');
                 successModal.classList.remove('flex');
             });
 
-            // Reset data
             pendingBookingData = null;
         });
     }
@@ -1888,6 +2023,22 @@ ${diagramSyntax}
         overlay.addEventListener('click', () => { sidebar.classList.add('-translate-x-full'); overlay.classList.add('hidden'); });
     }
 
+    // Notif batal pesanan
+    function openUnblockModal(date, time, label) {
+        tempUnblockDate = date;
+        tempUnblockTime = time;
+        tempUnblockLabel = label;
+        unblockModalText.textContent = `Apakah Anda yakin ingin membatalkan blokiran tanggal ${date} jam ${label}?`;
+        unblockModal.classList.remove('hidden');
+    }
+
+    function closeUnblockModal() {
+        tempUnblockDate = null;
+        tempUnblockTime = null;
+        tempUnblockLabel = null;
+        unblockModal.classList.add('hidden');
+    }
+
     // =================================================================
     // 3. EVENT LISTENERS & INITIALIZATION
     // =================================================================
@@ -2080,6 +2231,130 @@ ${diagramSyntax}
 
     initIcons();
 });
+
+    const unblockModal = document.getElementById('confirmUnblockModal');
+    const unblockModalText = document.getElementById('unblockModalText');
+    const confirmUnblockBtn = document.getElementById('confirmUnblockBtn');
+    const cancelUnblockBtn = document.getElementById('cancelUnblockBtn');
+
+    let tempUnblockDate = null;
+    let tempUnblockTime = null;
+    let tempUnblockLabel = null;
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const calendarEl = document.getElementById('calendar');
+        const timeModal = document.getElementById('timeSelectionModal');
+        const cancelBtn = document.getElementById('cancelTimeSelection');
+
+        let calendar = null;
+        let currentRoomId = null;
+        let blockedDates = [];
+        let tempSelectedDate = null;
+
+        function saveBlockedDatesToSession() {
+            if (currentRoomId) {
+                sessionStorage.setItem(`blockedDates-${currentRoomId}`, JSON.stringify(blockedDates));
+            }
+        }
+
+        function loadBlockedDatesFromSession() {
+            if (currentRoomId) {
+                const stored = sessionStorage.getItem(`blockedDates-${currentRoomId}`);
+                return stored ? JSON.parse(stored) : [];
+            }
+            return [];
+        }
+
+        function renderBlockedEvents() {
+            calendar.getEvents().forEach(event => event.remove());
+            blockedDates.forEach(item => {
+                calendar.addEvent({
+                    title: `❌ Diblok (${item.timeLabel})`,
+                    start: `${item.date}T${item.time}`,
+                    allDay: false,
+                    backgroundColor: '#f87171',
+                    borderColor: '#f87171'
+                });
+            });
+        }
+
+        function isBlocked(date, time) {
+            return blockedDates.some(item => item.date === date && item.time === time);
+        }
+
+        function removeBlockedDate(date, time) {
+            blockedDates = blockedDates.filter(item => !(item.date === date && item.time === time));
+            saveBlockedDatesToSession();
+            renderBlockedEvents();
+        }
+
+        // Buka modal waktu
+        function openTimeModal(date) {
+            tempSelectedDate = date;
+            timeModal.classList.remove('hidden');
+        }
+
+        // Tutup modal waktu
+        function closeTimeModal() {
+            tempSelectedDate = null;
+            timeModal.classList.add('hidden');
+        }
+
+        document.body.addEventListener('click', function (e) {
+            const btn = e.target.closest('.block-calendar-btn');
+            if (btn) {
+                currentRoomId = btn.dataset.roomId;
+
+                document.getElementById('calendarModal').classList.remove('hidden');
+                blockedDates = loadBlockedDatesFromSession();
+
+                if (!calendar) {
+                    calendar = new FullCalendar.Calendar(calendarEl, {
+                        initialView: 'dayGridMonth',
+                        selectable: true,
+                        select: function (info) {
+                            openTimeModal(info.startStr);
+                        }
+                    });
+
+                    calendar.render();
+                }
+
+                renderBlockedEvents();
+            }
+        });
+
+        // Tombol batal pada modal waktu
+        cancelBtn.addEventListener('click', closeTimeModal);
+
+        // Klik salah satu waktu
+        document.querySelectorAll('.select-time-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                const time = this.dataset.time;
+                const timeLabel = this.dataset.label;
+
+                if (isBlocked(tempSelectedDate, time)) {
+                    const confirmUnblock = confirm(`Tanggal ${tempSelectedDate} jam ${timeLabel} sudah diblok. Batalkan?`);
+                    if (confirmUnblock) {
+                        removeBlockedDate(tempSelectedDate, time);
+                        alert('Blokiran dibatalkan.');
+                    }
+                } else {
+                    blockedDates.push({ date: tempSelectedDate, time, timeLabel });
+                    saveBlockedDatesToSession();
+                    renderBlockedEvents();
+                    console.log(`Diblok: ${tempSelectedDate} jam ${timeLabel} untuk room ID ${currentRoomId}`);
+                }
+
+                closeTimeModal();
+            });
+        });
+
+        // Tutup modal utama
+        document.getElementById('closeCalendarModal').addEventListener('click', function () {
+            document.getElementById('calendarModal').classList.add('hidden');
+        });
+    });
 </script>
 
 </body>
