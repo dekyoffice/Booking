@@ -685,124 +685,124 @@ const blockedDates = [
     "2025-08-21"
 ];
 
-function renderCalendarInModal(roomId = null) {
-    const modal = document.getElementById('calendar-modal');
-    const container = modal.querySelector('.modal-content');
-    if (!container) return;
+    function renderCalendarInModal(roomId = null) {
+        const modal = document.getElementById('calendar-modal');
+        const container = modal.querySelector('.modal-content');
+        if (!container) return;
 
-    const room = roomId ? roomsData.find(r => r.id === roomId) : null;
-    const monthName = calendarDate.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
-    let headerHTML = `
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-bold text-gray-800">${room ? `Kalender Ketersediaan - ${room.name}` : 'Kalender Ketersediaan'}</h2>
-            <div class="flex items-center space-x-2">
-                <button id="calendar-prev-month-btn" class="p-2 rounded-full hover:bg-gray-200 transition-colors"><span class="hero-icon h-5 w-5 text-gray-600" data-icon="chevron-left"></span></button>
-                <span class="text-lg font-semibold text-gray-700 w-48 text-center">${monthName}</span>
-                <button id="calendar-next-month-btn" class="p-2 rounded-full hover:bg-gray-200 transition-colors"><span class="hero-icon h-5 w-5 text-gray-600" data-icon="chevron-right"></span></button>
+        const room = roomId ? roomsData.find(r => r.id === roomId) : null;
+        const monthName = calendarDate.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
+        let headerHTML = `
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">${room ? `Kalender Ketersediaan - ${room.name}` : 'Kalender Ketersediaan'}</h2>
+                <div class="flex items-center space-x-2">
+                    <button id="calendar-prev-month-btn" class="p-2 rounded-full hover:bg-gray-200 transition-colors"><span class="hero-icon h-5 w-5 text-gray-600" data-icon="chevron-left"></span></button>
+                    <span class="text-lg font-semibold text-gray-700 w-48 text-center">${monthName}</span>
+                    <button id="calendar-next-month-btn" class="p-2 rounded-full hover:bg-gray-200 transition-colors"><span class="hero-icon h-5 w-5 text-gray-600" data-icon="chevron-right"></span></button>
+                </div>
+                <button class="close-modal-btn text-gray-400 hover:text-gray-600 text-3xl leading-none">&times;</button>
             </div>
-            <button class="close-modal-btn text-gray-400 hover:text-gray-600 text-3xl leading-none">&times;</button>
-        </div>
-    `;
+        `;
 
-    const year = calendarDate.getFullYear();
-    const month = calendarDate.getMonth();
-    const weekdays = ['Ming', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
-    let gridHTML = `<div class="grid grid-cols-7 gap-px bg-gray-200 border border-gray-200 rounded-lg shadow-sm overflow-hidden">`;
-    gridHTML += weekdays.map(day => `<div class="text-center font-semibold text-xs py-3 bg-gray-50 text-gray-500 uppercase tracking-wider">${day}</div>`).join('');
+        const year = calendarDate.getFullYear();
+        const month = calendarDate.getMonth();
+        const weekdays = ['Ming', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+        let gridHTML = `<div class="grid grid-cols-7 gap-px bg-gray-200 border border-gray-200 rounded-lg shadow-sm overflow-hidden">`;
+        gridHTML += weekdays.map(day => `<div class="text-center font-semibold text-xs py-3 bg-gray-50 text-gray-500 uppercase tracking-wider">${day}</div>`).join('');
 
-    const firstDayOfMonth = new Date(year, month, 1);
-    const lastDayOfMonth = new Date(year, month + 1, 0);
-    const daysInMonth = lastDayOfMonth.getDate();
-    let startDayIndex = firstDayOfMonth.getDay();
+        const firstDayOfMonth = new Date(year, month, 1);
+        const lastDayOfMonth = new Date(year, month + 1, 0);
+        const daysInMonth = lastDayOfMonth.getDate();
+        let startDayIndex = firstDayOfMonth.getDay();
 
-    for (let i = 0; i < startDayIndex; i++) {
-        gridHTML += `<div class="bg-gray-50 min-h-[120px]"></div>`;
-    }
+        for (let i = 0; i < startDayIndex; i++) {
+            gridHTML += `<div class="bg-gray-50 min-h-[120px]"></div>`;
+        }
 
-    for (let day = 1; day <= daysInMonth; day++) {
-        const currentDate = new Date(year, month, day);
-        const dateString = currentDate.toISOString().split('T')[0];
-        const isBlocked = blockedDates.includes(dateString);
-        const isToday = currentDate.toDateString() === TODAY_DATE.toDateString();
-        const dayNumberStyles = isToday ? 'bg-blue-600 text-white' : 'bg-transparent text-gray-800';
+        for (let day = 1; day <= daysInMonth; day++) {
+            const currentDate = new Date(year, month, day);
+            const dateString = currentDate.toISOString().split('T')[0];
+            const isBlocked = blockedDates.includes(dateString);
+            const isToday = currentDate.toDateString() === TODAY_DATE.toDateString();
+            const dayNumberStyles = isToday ? 'bg-blue-600 text-white' : 'bg-transparent text-gray-800';
 
-        if (isBlocked) {
+            if (isBlocked) {
+                gridHTML += `
+                    <div class="p-2 min-h-[120px] bg-gray-100 relative cursor-not-allowed opacity-60" data-blocked="true">
+                        <div class="flex justify-end">
+                            <span class="h-7 w-7 flex items-center justify-center rounded-full text-sm font-semibold ${dayNumberStyles}">${day}</span>
+                        </div>
+                        <div class="mt-1 text-xs text-red-600 font-semibold">Diblokir</div>
+                        <div class="text-xs text-gray-500">Tidak dapat dipesan</div>
+                    </div>
+                `;
+                continue;
+            }
+
+            let bookingsOnDate = roomId
+                ? bookingsData.filter(b => b.roomId === roomId && b.date === dateString && (b.status === 'Disetujui' || b.status === 'Menunggu Persetujuan'))
+                : bookingsData.filter(b => b.date === dateString && (b.status === 'Disetujui' || b.status === 'Menunggu Persetujuan'));
+
+            let bookingInfoHTML = '';
+            if (bookingsOnDate.length > 0) {
+                if (roomId) {
+                    const booking = bookingsOnDate[0];
+                    const user = usersData.find(u => u.id === booking.userId);
+                    const statusClass = booking.status === 'Disetujui' ? 'bg-green-500' : 'bg-orange-400';
+                    bookingInfoHTML = `
+                        <div class="mt-1 text-xs">
+                            <div class="flex items-center mb-1">
+                                <span class="h-2 w-2 rounded-full ${statusClass} mr-2"></span>
+                                <span class="font-semibold">${booking.activity}</span>
+                            </div>
+                            <div class="text-gray-600">${booking.start} - ${booking.end}</div>
+                            <div class="text-gray-500">${user ? user.name : 'Unknown'}</div>
+                        </div>
+                    `;
+                } else {
+                    const physicalBookings = bookingsOnDate.filter(b => roomsData.find(r => r.id === b.roomId && r.type === 'Fisik')).length;
+                    const digitalBookings = bookingsOnDate.filter(b => roomsData.find(r => r.id === b.roomId && r.type === 'Digital')).length;
+                    bookingInfoHTML = '<ul class="mt-1 text-xs space-y-1">';
+                    if (physicalBookings > 0) bookingInfoHTML += `<li class="flex items-center"><span class="h-2 w-2 rounded-full bg-blue-500 mr-2"></span>${physicalBookings} Fisik</li>`;
+                    if (digitalBookings > 0) bookingInfoHTML += `<li class="flex items-center"><span class="h-2 w-2 rounded-full bg-green-500 mr-2"></span>${digitalBookings} Digital</li>`;
+                    bookingInfoHTML += '</ul>';
+                }
+            } else {
+                bookingInfoHTML = `<div class="mt-1 text-xs text-green-600">${roomId ? 'Tersedia' : 'Semua tersedia'}</div>`;
+                if (roomId) bookingInfoHTML += `<div class="mt-1 text-xs text-blue-600 font-medium">Klik untuk pesan</div>`;
+            }
+
             gridHTML += `
-                <div class="p-2 min-h-[120px] bg-gray-100 relative cursor-not-allowed opacity-60" data-blocked="true">
+                <div class="p-2 min-h-[120px] bg-white relative cursor-pointer hover:bg-gray-50 transition-colors" data-date="${dateString}" data-room-id="${roomId || ''}">
                     <div class="flex justify-end">
                         <span class="h-7 w-7 flex items-center justify-center rounded-full text-sm font-semibold ${dayNumberStyles}">${day}</span>
                     </div>
-                    <div class="mt-1 text-xs text-red-600 font-semibold">Diblokir</div>
-                    <div class="text-xs text-gray-500">Tidak dapat dipesan</div>
+                    ${bookingInfoHTML}
                 </div>
             `;
-            continue;
         }
 
-        let bookingsOnDate = roomId
-            ? bookingsData.filter(b => b.roomId === roomId && b.date === dateString && (b.status === 'Disetujui' || b.status === 'Menunggu Persetujuan'))
-            : bookingsData.filter(b => b.date === dateString && (b.status === 'Disetujui' || b.status === 'Menunggu Persetujuan'));
+        gridHTML += `</div>`;
+        container.innerHTML = headerHTML + gridHTML;
+        initIcons();
 
-        let bookingInfoHTML = '';
-        if (bookingsOnDate.length > 0) {
-            if (roomId) {
-                const booking = bookingsOnDate[0];
-                const user = usersData.find(u => u.id === booking.userId);
-                const statusClass = booking.status === 'Disetujui' ? 'bg-green-500' : 'bg-orange-400';
-                bookingInfoHTML = `
-                    <div class="mt-1 text-xs">
-                        <div class="flex items-center mb-1">
-                            <span class="h-2 w-2 rounded-full ${statusClass} mr-2"></span>
-                            <span class="font-semibold">${booking.activity}</span>
-                        </div>
-                        <div class="text-gray-600">${booking.start} - ${booking.end}</div>
-                        <div class="text-gray-500">${user ? user.name : 'Unknown'}</div>
-                    </div>
-                `;
-            } else {
-                const physicalBookings = bookingsOnDate.filter(b => roomsData.find(r => r.id === b.roomId && r.type === 'Fisik')).length;
-                const digitalBookings = bookingsOnDate.filter(b => roomsData.find(r => r.id === b.roomId && r.type === 'Digital')).length;
-                bookingInfoHTML = '<ul class="mt-1 text-xs space-y-1">';
-                if (physicalBookings > 0) bookingInfoHTML += `<li class="flex items-center"><span class="h-2 w-2 rounded-full bg-blue-500 mr-2"></span>${physicalBookings} Fisik</li>`;
-                if (digitalBookings > 0) bookingInfoHTML += `<li class="flex items-center"><span class="h-2 w-2 rounded-full bg-green-500 mr-2"></span>${digitalBookings} Digital</li>`;
-                bookingInfoHTML += '</ul>';
-            }
-        } else {
-            bookingInfoHTML = `<div class="mt-1 text-xs text-green-600">${roomId ? 'Tersedia' : 'Semua tersedia'}</div>`;
-            if (roomId) bookingInfoHTML += `<div class="mt-1 text-xs text-blue-600 font-medium">Klik untuk pesan</div>`;
-        }
+        const dateCells = container.querySelectorAll('[data-date]');
+        dateCells.forEach(cell => {
+            cell.addEventListener('click', function() {
+                if (cell.getAttribute('data-blocked')) return;
 
-        gridHTML += `
-            <div class="p-2 min-h-[120px] bg-white relative cursor-pointer hover:bg-gray-50 transition-colors" data-date="${dateString}" data-room-id="${roomId || ''}">
-                <div class="flex justify-end">
-                     <span class="h-7 w-7 flex items-center justify-center rounded-full text-sm font-semibold ${dayNumberStyles}">${day}</span>
-                </div>
-                ${bookingInfoHTML}
-            </div>
-        `;
-    }
+                const date = this.getAttribute('data-date');
+                const roomId = this.getAttribute('data-room-id');
 
-    gridHTML += `</div>`;
-    container.innerHTML = headerHTML + gridHTML;
-    initIcons();
+                const calendarModal = document.getElementById('calendar-modal');
+                calendarModal.classList.add('hidden');
+                calendarModal.classList.remove('flex');
+                currentCalendarRoomId = null;
 
-    const dateCells = container.querySelectorAll('[data-date]');
-    dateCells.forEach(cell => {
-        cell.addEventListener('click', function() {
-            if (cell.getAttribute('data-blocked')) return;
-
-            const date = this.getAttribute('data-date');
-            const roomId = this.getAttribute('data-room-id');
-
-            const calendarModal = document.getElementById('calendar-modal');
-            calendarModal.classList.add('hidden');
-            calendarModal.classList.remove('flex');
-            currentCalendarRoomId = null;
-
-            if (roomId) showBookingModal(parseInt(roomId), date);
+                if (roomId) showBookingModal(parseInt(roomId), date);
+            });
         });
-    });
-}
+    }
 
 
     function showCalendarModal(roomId = null) {
@@ -813,149 +813,149 @@ function renderCalendarInModal(roomId = null) {
         modal.classList.add('flex');
     }
 
-  function renderUserDaftarPage() {
-    const container = document.getElementById('page-user-daftar');
-    if (!container) return;
-    const todayString = TODAY_DATE.toISOString().split('T')[0];
-    const todayFormatted = TODAY_DATE.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+    function renderUserDaftarPage() {
+        const container = document.getElementById('page-user-daftar');
+        if (!container) return;
+        const todayString = TODAY_DATE.toISOString().split('T')[0];
+        const todayFormatted = TODAY_DATE.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
-    let searchQuery = '';
-    let selectedDinas = '';
+        let searchQuery = '';
+        let selectedDinas = '';
 
-    // Ambil daftar dinas unik dari roomsData
-    const dinasList = [...new Set(roomsData.map(r => r.dinas).filter(Boolean))];
+        // Ambil daftar dinas unik dari roomsData
+        const dinasList = [...new Set(roomsData.map(r => r.dinas).filter(Boolean))];
 
-    function renderRoomList() {
-        let filteredRooms = roomsData
-            .filter(room => !room.hidden) // hide ruangan yang disembunyikan
-            .filter(room => {
-                const q = searchQuery.toLowerCase();
-                const dinasMatch = selectedDinas === '' || 
-                                   (room.dinas && room.dinas.toLowerCase().includes(selectedDinas.toLowerCase()));
+        function renderRoomList() {
+            let filteredRooms = roomsData
+                .filter(room => !room.hidden) // hide ruangan yang disembunyikan
+                .filter(room => {
+                    const q = searchQuery.toLowerCase();
+                    const dinasMatch = selectedDinas === '' || 
+                                    (room.dinas && room.dinas.toLowerCase().includes(selectedDinas.toLowerCase()));
 
-                return (
-                    dinasMatch &&
-                    (
-                        room.name.toLowerCase().includes(q) ||
-                        room.type.toLowerCase().includes(q) ||
-                        String(room.capacity).includes(q) ||
-                        (room.dinas && room.dinas.toLowerCase().includes(q))
-                    )
-                );
-            });
+                    return (
+                        dinasMatch &&
+                        (
+                            room.name.toLowerCase().includes(q) ||
+                            room.type.toLowerCase().includes(q) ||
+                            String(room.capacity).includes(q) ||
+                            (room.dinas && room.dinas.toLowerCase().includes(q))
+                        )
+                    );
+                });
 
-        let roomListHTML = filteredRooms.map(room => {
-            const todayBookings = bookingsData.filter(b => b.roomId === room.id && b.date === todayString && (b.status === 'Disetujui' || b.status === 'Menunggu Persetujuan'));
-            const isBookedToday = todayBookings.length > 0;
+            let roomListHTML = filteredRooms.map(room => {
+                const todayBookings = bookingsData.filter(b => b.roomId === room.id && b.date === todayString && (b.status === 'Disetujui' || b.status === 'Menunggu Persetujuan'));
+                const isBookedToday = todayBookings.length > 0;
 
-            let statusHTML = '';
-            if (isBookedToday) {
-                const booking = todayBookings[0];
-                const user = usersData.find(u => u.id === booking.userId);
-                const statusClass = booking.status === 'Disetujui' ? 'text-green-600' : 'text-orange-600';
-                const statusText = booking.status === 'Disetujui' ? 'Disetujui' : 'Menunggu';
+                let statusHTML = '';
+                if (isBookedToday) {
+                    const booking = todayBookings[0];
+                    const user = usersData.find(u => u.id === booking.userId);
+                    const statusClass = booking.status === 'Disetujui' ? 'text-green-600' : 'text-orange-600';
+                    const statusText = booking.status === 'Disetujui' ? 'Disetujui' : 'Menunggu';
 
-                statusHTML = `
-                    <div class="text-sm mb-3 pl-6">
-                        <p class="text-gray-500">Dinas: <span class="font-medium text-gray-700">${room.dinas}</span></p>
-                        <p class="text-gray-500">Status: <span class="font-semibold ${statusClass}">${statusText}</span></p>
-                        <p class="text-gray-500">Aktivitas: <span class="font-medium text-gray-700">${booking.activity}</span></p>
-                        <p class="text-gray-500">Waktu: <span class="font-medium text-gray-700">${booking.start} - ${booking.end}</span></p>
-                        <p class="text-gray-500">Pemesan: <span class="font-medium text-gray-700">${user ? user.name : 'Unknown'}</span></p>
-                    </div>
-                `;
-            } else {
-                statusHTML = `
-                    <div class="text-sm mb-3 pl-6">
-                        <p class="text-gray-500">Dinas: <span class="font-medium text-gray-700">${room.dinas}</span></p>
-                        <p class="text-gray-500">Status: <span class="font-semibold text-green-600">Tersedia</span></p>
-                        <p class="text-gray-500">Tidak ada jadwal untuk hari ini</p>
-                    </div>
-                `;
-            }
-
-            const typeIcon = room.type === 'Fisik' ? 'building-office-2' : 'wifi';
-            return `
-                <div class="bg-white rounded-lg shadow-lg p-5 flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-                    <div>
-                        <h3 class="font-bold text-lg mb-2 text-gray-800">${room.name}</h3>
-                        <div class="flex items-center text-sm mb-1 text-gray-500">
-                            <span class="hero-icon h-4 w-4 mr-2 text-gray-400" data-icon="${typeIcon}"></span>
-                            Tipe: <span class="font-medium text-gray-700 ml-1">${room.type}</span>
+                    statusHTML = `
+                        <div class="text-sm mb-3 pl-6">
+                            <p class="text-gray-500">Dinas: <span class="font-medium text-gray-700">${room.dinas}</span></p>
+                            <p class="text-gray-500">Status: <span class="font-semibold ${statusClass}">${statusText}</span></p>
+                            <p class="text-gray-500">Aktivitas: <span class="font-medium text-gray-700">${booking.activity}</span></p>
+                            <p class="text-gray-500">Waktu: <span class="font-medium text-gray-700">${booking.start} - ${booking.end}</span></p>
+                            <p class="text-gray-500">Pemesan: <span class="font-medium text-gray-700">${user ? user.name : 'Unknown'}</span></p>
                         </div>
-                        <p class="text-sm mb-1 text-gray-500 pl-6">Kapasitas: ${room.capacity} ${room.type === 'Fisik' ? 'orang' : 'peserta'}</p>
-                        ${statusHTML}
-                    </div>
-                    <div class="flex items-center justify-between mt-4">
-                        <input type="checkbox" class="room-select mr-2 w-6 h-6 accent-blue-600 cursor-pointer" value="${room.id}">
-                        <button data-room-id="${room.id}" class="open-room-calendar-btn bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md">Pesan</button>
-                    </div>
-                </div>`;
-        }).join('');
+                    `;
+                } else {
+                    statusHTML = `
+                        <div class="text-sm mb-3 pl-6">
+                            <p class="text-gray-500">Dinas: <span class="font-medium text-gray-700">${room.dinas}</span></p>
+                            <p class="text-gray-500">Status: <span class="font-semibold text-green-600">Tersedia</span></p>
+                            <p class="text-gray-500">Tidak ada jadwal untuk hari ini</p>
+                        </div>
+                    `;
+                }
 
-        document.getElementById('room-list-container').innerHTML = roomListHTML;
+                const typeIcon = room.type === 'Fisik' ? 'building-office-2' : 'wifi';
+                return `
+                    <div class="bg-white rounded-lg shadow-lg p-5 flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                        <div>
+                            <h3 class="font-bold text-lg mb-2 text-gray-800">${room.name}</h3>
+                            <div class="flex items-center text-sm mb-1 text-gray-500">
+                                <span class="hero-icon h-4 w-4 mr-2 text-gray-400" data-icon="${typeIcon}"></span>
+                                Tipe: <span class="font-medium text-gray-700 ml-1">${room.type}</span>
+                            </div>
+                            <p class="text-sm mb-1 text-gray-500 pl-6">Kapasitas: ${room.capacity} ${room.type === 'Fisik' ? 'orang' : 'peserta'}</p>
+                            ${statusHTML}
+                        </div>
+                        <div class="flex items-center justify-between mt-4">
+                            <input type="checkbox" class="room-select mr-2 w-6 h-6 accent-blue-600 cursor-pointer" value="${room.id}">
+                            <button data-room-id="${room.id}" class="open-room-calendar-btn bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md">Pesan</button>
+                        </div>
+                    </div>`;
+            }).join('');
 
-        // Event untuk checkbox
-        document.querySelectorAll('.room-select').forEach(checkbox => {
-            checkbox.addEventListener('change', () => {
-                const selected = document.querySelectorAll('.room-select:checked');
-                document.getElementById('selected-count').textContent = selected.length;
-                document.getElementById('multi-booking-bar').classList.toggle('hidden', selected.length === 0);
+            document.getElementById('room-list-container').innerHTML = roomListHTML;
+
+            // Event untuk checkbox
+            document.querySelectorAll('.room-select').forEach(checkbox => {
+                checkbox.addEventListener('change', () => {
+                    const selected = document.querySelectorAll('.room-select:checked');
+                    document.getElementById('selected-count').textContent = selected.length;
+                    document.getElementById('multi-booking-bar').classList.toggle('hidden', selected.length === 0);
+                });
             });
+        }
+
+        // HTML utama
+        container.innerHTML = `
+            <h1 class="text-2xl lg:text-3xl font-bold mb-6 text-gray-800">Daftar Ruangan Rapat</h1>
+            <div class="mb-4 flex justify-end gap-2">
+                <div class="relative w-full sm:w-80">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">🔍</span>
+                    <input type="text" id="search-room" placeholder="Cari ruangan..." 
+                        class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                </div>
+                <!-- Dropdown Filter Dinas -->
+                <div class="relative w-full sm:w-56">
+                    <input type="text" id="filter-dinas" placeholder="Cari dinas..."
+                        list="dinas-list"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                    <datalist id="dinas-list">
+                        ${dinasList.map(d => `<option value="${d}"></option>`).join('')}
+                    </datalist>
+                </div>
+            </div>
+
+            <section id="room-list-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-20"></section>
+            <div id="multi-booking-bar" class="hidden fixed bottom-0 left-0 w-full bg-blue-700 p-4">
+                <button id="multi-booking-btn" class="open-room-calendar-btn w-full bg-blue-600 hover:bg-blue-700 px-4 py-3 rounded text-white text-lg font-semibold">
+                    Pesan Sekaligus (<span id="selected-count">0</span> Ruangan)
+                </button>
+            </div>
+        `;
+
+        // Event search
+        document.getElementById('search-room').addEventListener('input', (e) => {
+            searchQuery = e.target.value;
+            renderRoomList();
+        });
+
+        // Event filter dinas
+        document.getElementById('filter-dinas').addEventListener('input', (e) => {
+            selectedDinas = e.target.value;
+            renderRoomList();
+        });
+
+        // Render awal
+        renderRoomList();
+
+        // Event tombol "Pesan Sekaligus"
+        document.getElementById('multi-booking-btn').addEventListener('click', () => {
+            const selectedIds = Array.from(document.querySelectorAll('.room-select:checked')).map(cb => parseInt(cb.value));
+            if (selectedIds.length > 0) {
+                showBookingModal(selectedIds);
+            }
         });
     }
-
-    // HTML utama
-    container.innerHTML = `
-        <h1 class="text-2xl lg:text-3xl font-bold mb-6 text-gray-800">Daftar Ruangan Rapat</h1>
-        <div class="mb-4 flex justify-end gap-2">
-            <div class="relative w-full sm:w-80">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">🔍</span>
-                <input type="text" id="search-room" placeholder="Cari ruangan..." 
-                    class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-            </div>
-            <!-- Dropdown Filter Dinas -->
-            <div class="relative w-full sm:w-56">
-                <input type="text" id="filter-dinas" placeholder="Cari dinas..."
-                    list="dinas-list"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                <datalist id="dinas-list">
-                    ${dinasList.map(d => `<option value="${d}"></option>`).join('')}
-                </datalist>
-            </div>
-        </div>
-
-        <section id="room-list-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-20"></section>
-        <div id="multi-booking-bar" class="hidden fixed bottom-0 left-0 w-full bg-blue-700 p-4">
-            <button id="multi-booking-btn" class="open-room-calendar-btn w-full bg-blue-600 hover:bg-blue-700 px-4 py-3 rounded text-white text-lg font-semibold">
-                Pesan Sekaligus (<span id="selected-count">0</span> Ruangan)
-            </button>
-        </div>
-    `;
-
-    // Event search
-    document.getElementById('search-room').addEventListener('input', (e) => {
-        searchQuery = e.target.value;
-        renderRoomList();
-    });
-
-    // Event filter dinas
-    document.getElementById('filter-dinas').addEventListener('input', (e) => {
-        selectedDinas = e.target.value;
-        renderRoomList();
-    });
-
-    // Render awal
-    renderRoomList();
-
-    // Event tombol "Pesan Sekaligus"
-    document.getElementById('multi-booking-btn').addEventListener('click', () => {
-        const selectedIds = Array.from(document.querySelectorAll('.room-select:checked')).map(cb => parseInt(cb.value));
-        if (selectedIds.length > 0) {
-            showBookingModal(selectedIds);
-        }
-    });
-}
 
     function renderEmptyState(title, message, icon) {
         return `
@@ -1565,7 +1565,7 @@ ${diagramSyntax}
     
     // --- Modal Functions ---
     
-   let pendingBookingData = null;
+    let pendingBookingData = null;
 
     function showBookingModal(roomIdOrArray, selectedDate = null) {
         const roomIds = Array.isArray(roomIdOrArray) ? roomIdOrArray : [roomIdOrArray];
@@ -1648,9 +1648,16 @@ ${diagramSyntax}
 
         // Tutup modal booking
         modal.querySelectorAll('.close-modal-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
+            btn.addEventListener('click', (e) => {
+                const backRoomId = e.target.getAttribute('data-back-room');
+
                 modal.classList.add('hidden');
                 modal.classList.remove('flex');
+
+                if (backRoomId) {
+                    // Kembali ke halaman pemilihan tanggal
+                  showCalendarModal(backRoomId);
+                }
             });
         });
 
