@@ -341,10 +341,32 @@
     <div id="upload-file-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center">
         <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
             <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-bold text-gray-800">Upload Dokumen Pendukung Tengkawang</h2>
-            <button class="close-upload-btn text-gray-400 hover:text-gray-600 text-3xl leading-none">&times;</button>
+                <h2 class="text-2xl font-bold text-gray-800">Upload Dokumen Pendukung</h2>
+                <button class="close-upload-btn text-gray-400 hover:text-gray-600 text-3xl leading-none">&times;</button>
             </div>
 
+            <h4 class="text-2xl font-bold text-gray-800">Ruang Tengkawang</h2>
+            <form id="upload-file-form">
+            <input type="file" id="support-file" name="support-file" accept=".pdf,.doc,.docx,.jpg,.png" required class="mb-4 block w-full">
+            <div class="flex justify-end space-x-3">
+                <button type="button" class="close-upload-btn bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300">Batal</button>
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-green-700">Kirim</button>
+            </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="upload-file-modaldua" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Upload Dokumen Pendukung</h2>
+                <button class="close-upload-btn text-gray-400 hover:text-gray-600 text-3xl leading-none">&times;</button>
+            </div>
+
+            <h2 class="text-2xl font-bold text-gray-800">Ruang Tengkawang</h2>
+            <form id="upload-file-form">
+            <input type="file" id="support-file" name="support-file" accept=".pdf,.doc,.docx,.jpg,.png" required class="mb-4 block w-full">
+            <h2 class="text-2xl font-bold text-gray-800">Ruang Audio Visual</h2>
             <form id="upload-file-form">
             <input type="file" id="support-file" name="support-file" accept=".pdf,.doc,.docx,.jpg,.png" required class="mb-4 block w-full">
             <div class="flex justify-end space-x-3">
@@ -361,19 +383,6 @@
             <h2 class="text-xl font-semibold mb-4">Blokir Tanggal</h2>
             <div id="calendar"></div>
             <button id="closeCalendarModal" class="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-xl">&times;</button>
-        </div>
-    </div>
-
-    <!-- Modal Pilihan Waktu -->
-    <div id="timeSelectionModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
-        <div class="bg-white p-6 rounded-md shadow-md w-72 text-center">
-            <h2 class="text-lg font-semibold mb-4">Pilih Waktu Blokir</h2>
-            <div class="flex flex-col gap-3">
-            <button data-time="08:00:00" data-label="Pagi" class="select-time-btn bg-blue-100 hover:bg-blue-200 text-blue-800 font-semibold py-2 rounded">🌅 Pagi (08:00)</button>
-            <button data-time="13:00:00" data-label="Siang" class="select-time-btn bg-yellow-100 hover:bg-yellow-200 text-yellow-800 font-semibold py-2 rounded">☀️ Siang (13:00)</button>
-            <button data-time="19:00:00" data-label="Malam" class="select-time-btn bg-purple-100 hover:bg-purple-200 text-purple-800 font-semibold py-2 rounded">🌙 Malam (19:00)</button>
-            </div>
-            <button id="cancelTimeSelection" class="mt-5 text-sm text-gray-500 hover:text-gray-700">Batal</button>
         </div>
     </div>
 
@@ -432,7 +441,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let bookings = [];
         let idCounter = 1;
         const activities = ["Rapat Rutin", "Presentasi Klien", "Training Internal", "Diskusi Proyek", "Wawancara Kandidat", "Brainstorming Sesi", "Webinar"];
-        const statuses = ["Disetujui", "Selesai", "Menunggu Persetujuan", "Ditolak"];
+        const statuses = ["Sudah Dijadwalkan", "Selesai", "Sedang Ditinjau", "Tidak Tersedia"];
 
         for (let i = 0; i < 90; i++) {
             let date = new Date(TODAY_DATE);
@@ -450,11 +459,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const endHour = startHour + duration;
                 
                 let status = statuses[Math.floor(Math.random() * statuses.length)];
-                if (date < TODAY_DATE && status === 'Disetujui') {
+                if (date < TODAY_DATE && status === 'Sudah Dijadwalkan') {
                     status = 'Selesai';
                 }
                 if (date >= TODAY_DATE && status === 'Selesai') {
-                    status = 'Disetujui';
+                    status = 'Sudah Dijadwalkan';
                 }
 
                 bookings.push({
@@ -669,10 +678,10 @@ document.addEventListener('DOMContentLoaded', () => {
     
     /** Checks booking status based on date */
     function getBookingStatus(booking) {
-        if (booking.status === 'Ditolak') return { text: 'Ditolak', class: 'bg-red-100 text-red-800' };
-        if (booking.status === 'Menunggu Persetujuan') return { text: 'Menunggu Persetujuan', class: 'bg-orange-100 text-orange-800' };
+        if (booking.status === 'Tidak Tersedia') return { text: 'Tidak Tersedia', class: 'bg-red-100 text-red-800' };
+        if (booking.status === 'Sedang Ditinjau') return { text: 'Sedang Ditinjau', class: 'bg-orange-100 text-orange-800' };
         if (new Date(booking.date) < TODAY_DATE) return { text: 'Selesai', class: 'bg-gray-200 text-gray-800' };
-        return { text: 'Disetujui', class: 'bg-green-100 text-green-800' };
+        return { text: 'Sudah Dijadwalkan', class: 'bg-green-100 text-green-800' };
     }
 
 
@@ -689,7 +698,7 @@ const blockedDates = [
         const modal = document.getElementById('calendar-modal');
         const container = modal.querySelector('.modal-content');
         if (!container) return;
-
+        
         const room = roomId ? roomsData.find(r => r.id === roomId) : null;
         const monthName = calendarDate.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
         let headerHTML = `
@@ -732,7 +741,7 @@ const blockedDates = [
                         <div class="flex justify-end">
                             <span class="h-7 w-7 flex items-center justify-center rounded-full text-sm font-semibold ${dayNumberStyles}">${day}</span>
                         </div>
-                        <div class="mt-1 text-xs text-red-600 font-semibold">Diblokir</div>
+                        <div class="mt-1 text-xs text-red-600 font-semibold">Tidak Tersedia</div>
                         <div class="text-xs text-gray-500">Tidak dapat dipesan</div>
                     </div>
                 `;
@@ -740,15 +749,15 @@ const blockedDates = [
             }
 
             let bookingsOnDate = roomId
-                ? bookingsData.filter(b => b.roomId === roomId && b.date === dateString && (b.status === 'Disetujui' || b.status === 'Menunggu Persetujuan'))
-                : bookingsData.filter(b => b.date === dateString && (b.status === 'Disetujui' || b.status === 'Menunggu Persetujuan'));
+                ? bookingsData.filter(b => b.roomId === roomId && b.date === dateString && (b.status === 'Sudah Dijadwalkan' || b.status === 'Sedang Ditinjau'))
+                : bookingsData.filter(b => b.date === dateString && (b.status === 'Sudah Dijadwalkan' || b.status === 'Sedang Ditinjau'));
 
             let bookingInfoHTML = '';
             if (bookingsOnDate.length > 0) {
                 if (roomId) {
                     const booking = bookingsOnDate[0];
                     const user = usersData.find(u => u.id === booking.userId);
-                    const statusClass = booking.status === 'Disetujui' ? 'bg-green-500' : 'bg-orange-400';
+                    const statusClass = booking.status === 'Sudah Dijadwalkan' ? 'bg-green-500' : 'bg-orange-400';
                     bookingInfoHTML = `
                         <div class="mt-1 text-xs">
                             <div class="flex items-center mb-1">
@@ -845,15 +854,15 @@ const blockedDates = [
                 });
 
             let roomListHTML = filteredRooms.map(room => {
-                const todayBookings = bookingsData.filter(b => b.roomId === room.id && b.date === todayString && (b.status === 'Disetujui' || b.status === 'Menunggu Persetujuan'));
+                const todayBookings = bookingsData.filter(b => b.roomId === room.id && b.date === todayString && (b.status === 'Sudah Dijadwalkan' || b.status === 'Sedang Ditinjau'));
                 const isBookedToday = todayBookings.length > 0;
 
                 let statusHTML = '';
                 if (isBookedToday) {
                     const booking = todayBookings[0];
                     const user = usersData.find(u => u.id === booking.userId);
-                    const statusClass = booking.status === 'Disetujui' ? 'text-green-600' : 'text-orange-600';
-                    const statusText = booking.status === 'Disetujui' ? 'Disetujui' : 'Menunggu';
+                    const statusClass = booking.status === 'Sudah Dijadwalkan' ? 'text-green-600' : 'text-orange-600';
+                    const statusText = booking.status === 'Sudah Dijadwalkan' ? 'Sudah Dijadwalkan' : 'Menunggu';
 
                     statusHTML = `
                         <div class="text-sm mb-3 pl-6">
@@ -952,7 +961,7 @@ const blockedDates = [
         document.getElementById('multi-booking-btn').addEventListener('click', () => {
             const selectedIds = Array.from(document.querySelectorAll('.room-select:checked')).map(cb => parseInt(cb.value));
             if (selectedIds.length > 0) {
-                showBookingModal(selectedIds);
+                showBookingModal2(selectedIds);
             }
         });
     }
@@ -990,7 +999,7 @@ const blockedDates = [
                 }
 
                 let uploadButton = '';
-                if (status.text === 'Disetujui' || status.text === 'Selesai') {
+                if (status.text === 'Sudah Dijadwalkan' || status.text === 'Selesai') {
                     uploadButton = `
                         <label class="ml-4 cursor-pointer bg-green-100 text-green-700 font-semibold py-1 px-3 rounded-md hover:bg-green-200 transition-colors text-sm">
                             Upload File
@@ -1127,8 +1136,8 @@ ${diagramSyntax}
         const finalFilteredBookings = filteredBookings.filter(b => filteredRoomIds.has(b.roomId));
 
         // KPI Calculations
-        const approvedAndFinished = finalFilteredBookings.filter(b => b.status === 'Disetujui' || getBookingStatus(b).text === 'Selesai');
-        const totalRequests = finalFilteredBookings.filter(b => ['Disetujui', 'Ditolak', 'Selesai'].includes(b.status) || getBookingStatus(b).text === 'Selesai').length;
+        const approvedAndFinished = finalFilteredBookings.filter(b => b.status === 'Sudah Dijadwalkan' || getBookingStatus(b).text === 'Selesai');
+        const totalRequests = finalFilteredBookings.filter(b => ['Sudah Dijadwalkan', 'Tidak Tersedia', 'Selesai'].includes(b.status) || getBookingStatus(b).text === 'Selesai').length;
         const approvalRate = totalRequests > 0 ? (approvedAndFinished.length / totalRequests * 100).toFixed(1) : 0;
         
         let occupancyRate = 0;
@@ -1305,7 +1314,7 @@ ${diagramSyntax}
         const timeToMinutes = (time) => { const [hours, minutes] = time.split(':').map(Number); return hours * 60 + minutes; };
         
         const filteredRooms = filterType === 'all'  ? roomsData : roomsData.filter(room => room.type === filterType);
-        const bookingsOnDate = bookingsData.filter(b => b.date === scheduleDate && (b.status === 'Disetujui' || b.status === 'Menunggu Persetujuan'));
+        const bookingsOnDate = bookingsData.filter(b => b.date === scheduleDate && (b.status === 'Sudah Dijadwalkan' || b.status === 'Sedang Ditinjau'));
         const timeSlots = Array.from({length: 10}, (_, i) => `${String(i + 8).padStart(2, '0')}:00`);
         
         let headerHTML = '<th>Jam</th>';
@@ -1326,7 +1335,7 @@ ${diagramSyntax}
                         const nextHour = parseInt(time.split(':')[0]) + i;
                         if (nextHour < 18) cellStates[`${String(nextHour).padStart(2, '0')}:00-${room.id}`] = 'spanned';
                     }
-                    const bgColor = booking.status === 'Disetujui' ? 'bg-green-500' : 'bg-orange-400';
+                    const bgColor = booking.status === 'Sudah Dijadwalkan' ? 'bg-green-500' : 'bg-orange-400';
                     bodyHTML += `<td rowspan="${rowspan}" class="booked-cell ${bgColor}" title="${booking.activity} oleh ${usersData.find(u => u.id === booking.userId)?.name || ''}">${booking.activity}</td>`;
                 } else {
                     bodyHTML += `<td></td>`;
@@ -1477,16 +1486,21 @@ ${diagramSyntax}
             gridHTML += `<div class="bg-gray-50 min-h-[100px]"></div>`;
         }
 
+        // Ambil data blokir dari localStorage
+        const blockedDates = JSON.parse(localStorage.getItem('blockedDates') || '{}');
+
         for (let day = 1; day <= daysInMonth; day++) {
             const date = new Date(year, month, day);
             const dateString = date.toISOString().split('T')[0];
 
+            const isBlocked = blockedDates[roomId]?.some(item => item.date === dateString && item.time === 'full');
+
             gridHTML += `
-                <div class="p-2 min-h-[100px] bg-white relative cursor-pointer hover:bg-red-50 transition-colors" data-date="${dateString}">
+                <div class="p-2 min-h-[100px] ${isBlocked ? 'bg-gray-300 cursor-not-allowed' : 'bg-white cursor-pointer hover:bg-red-50'} transition-colors" data-date="${dateString}">
                     <div class="flex justify-end">
                         <span class="h-6 w-6 flex items-center justify-center rounded-full text-sm font-semibold text-gray-800">${day}</span>
                     </div>
-                    <div class="mt-2 text-xs text-blue-600 font-medium text-center">Klik untuk Blokir</div>
+                    <div class="mt-2 text-xs text-blue-600 font-medium text-center">${isBlocked ? 'Diblokir' : 'Klik untuk Blokir'}</div>
                 </div>
             `;
         }
@@ -1494,17 +1508,41 @@ ${diagramSyntax}
         gridHTML += '</div>';
         container.innerHTML = headerHTML + gridHTML;
 
-        // Event klik tanggal
+        // Event klik tanggal → langsung blokir full day
         container.querySelectorAll('[data-date]').forEach(cell => {
             cell.addEventListener('click', () => {
                 const date = cell.getAttribute('data-date');
-                if (roomId && date) {
-                    openBlockDateForm(roomId, date); // <- Fungsi untuk blokir tanggal
+                if (!roomId || !date) return;
+
+                // Cegah klik jika sudah diblokir
+                if (blockedDates[roomId]?.some(item => item.date === date && item.time === 'full')) {
+                    alert('Tanggal ini sudah diblokir.');
+                    return;
                 }
+
+                // Simpan ke localStorage
+                if (!blockedDates[roomId]) {
+                    blockedDates[roomId] = [];
+                }
+                blockedDates[roomId].push({ date: date, time: 'full' });
+                localStorage.setItem('blockedDates', JSON.stringify(blockedDates));
+
+                // Render ulang agar status berubah
+                renderAdminCalendarInModal(roomId);
             });
         });
 
-        // Tombol close
+        // Tombol prev/next bulan
+        container.querySelector('#admin-calendar-prev-month-btn').addEventListener('click', () => {
+            calendarDate.setMonth(calendarDate.getMonth() - 1);
+            renderAdminCalendarInModal(roomId);
+        });
+        container.querySelector('#admin-calendar-next-month-btn').addEventListener('click', () => {
+            calendarDate.setMonth(calendarDate.getMonth() + 1);
+            renderAdminCalendarInModal(roomId);
+        });
+
+        // Tombol close modal
         container.querySelector('.close-admin-modal-btn').addEventListener('click', () => {
             modal.classList.add('hidden');
             modal.classList.remove('flex');
@@ -1515,7 +1553,7 @@ ${diagramSyntax}
         const container = document.getElementById('page-admin-all-bookings');
         if (!container) return;
         
-        const statusOrder = { "Menunggu Persetujuan": 1, "Disetujui": 2, "Ditolak": 3, "Selesai": 4 };
+        const statusOrder = { "Sedang Ditinjau": 1, "Sudah Dijadwalkan": 2, "Tidak Tersedia": 3, "Selesai": 4 };
         const allBookings = [...bookingsData].sort((a, b) => statusOrder[getBookingStatus(a).text] - statusOrder[getBookingStatus(b).text] || new Date(b.date) - new Date(a.date));
         
         let tableRowsHTML = allBookings.map(booking => {
@@ -1524,13 +1562,13 @@ ${diagramSyntax}
             const status = getBookingStatus(booking);
             let actionButtons = '';
 
-            if (status.text === 'Menunggu Persetujuan') {
+            if (status.text === 'Sedang Ditinjau') {
                 actionButtons = `
                     <button data-booking-id="${booking.id}" class="approve-booking-btn bg-green-500 text-white p-1.5 rounded-md hover:bg-green-600 transition-colors flex items-center justify-center" title="Setujui"><span class="h-4 w-4 hero-icon" data-icon="check"></span></button>
                     <button data-booking-id="${booking.id}" class="reject-booking-btn bg-red-500 text-white p-1.5 rounded-md hover:bg-red-600 transition-colors flex items-center justify-center" title="Tolak"><span class="h-4 w-4 hero-icon" data-icon="x-mark"></span></button>
                     <a href="#schedule" data-date="${booking.date}" class="view-schedule-btn bg-blue-500 text-white p-1.5 rounded-md hover:bg-blue-600 transition-colors flex items-center justify-center" title="Lihat Jadwal"><span class="h-4 w-4 hero-icon" data-icon="calendar-days"></span></a>
                 `;
-            } else if (status.text === 'Disetujui') {
+            } else if (status.text === 'Sudah Dijadwalkan') {
                 actionButtons = `<button data-booking-id="${booking.id}" class="cancel-booking-btn bg-gray-500 text-white p-1.5 rounded-md hover:bg-gray-600 transition-colors flex items-center justify-center" title="Batalkan"><span class="h-4 w-4 hero-icon" data-icon="trash"></span></button>`;
             }
             
@@ -1740,84 +1778,179 @@ ${diagramSyntax}
         document.getElementById('upload-success-modal').classList.remove('flex');
     });
 
-    // Modal upload file
-    function openUploadFileModal(roomIds) {
-        const uploadModal = document.getElementById('upload-file-modal');
-        const content = uploadModal.querySelector('.modal-content');
+    function showBookingModal2(roomIdOrArray, selectedDate = null) {
+        const roomIds = Array.isArray(roomIdOrArray) ? roomIdOrArray : [roomIdOrArray];
+        const selectedRooms = roomsData.filter(r => roomIds.includes(r.id));
+        const modal = document.getElementById('booking-modal');
+        const modalContent = modal.querySelector('.modal-content');
 
-        // Ambil nama-nama ruangan berdasarkan ID dari roomsData
-        const roomNames = roomIds.map(id => {
-            const room = roomsData.find(r => r.id === parseInt(id));
-            return room ? room.name : `Ruangan ID ${id}`;
-        });
+        const minDate = new Date();
+        minDate.setDate(minDate.getDate() + 1);
+        const minDateString = minDate.toISOString().split('T')[0];
+        const dateToUse = selectedDate && selectedDate >= minDateString ? selectedDate : minDateString;
 
-        content.innerHTML = `
+        const roomNames = selectedRooms.map(r => r.name).join(', ');
+
+        let infoHTML = `
+            <div class="mt-4">
+                <h3 class="text-lg font-semibold mb-2">Informasi Ruangan</h3>
+                <div class="max-h-40 overflow-y-auto border rounded p-2 bg-gray-50">
+                    ${selectedRooms.map(r => `
+                        <div class="p-2 border-b border-gray-200">
+                            <p><strong>${r.name}</strong> (${r.type})</p>
+                            <p>Dinas: ${r.dinas || '-'}</p>
+                            <p>Kapasitas: ${r.capacity} ${r.type === 'Fisik' ? 'orang' : 'peserta'}</p>
+                            <p>Fasilitas: ${r.facilities}</p>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+
+        modalContent.innerHTML = `
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold text-gray-800">Upload Dokumen Pendukung</h2>
-                <button class="close-upload-btn text-gray-400 hover:text-gray-600 text-3xl leading-none">&times;</button>
+                <h2 class="text-2xl font-bold text-gray-800">Pesan Ruangan: ${roomNames}</h2>
+                <button class="close-modal-btn text-gray-400 hover:text-gray-600 text-3xl leading-none">&times;</button>
             </div>
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Nama Ruangan</label>
-                <p class="text-gray-800 font-semibold">${roomNames.join(', ')}</p>
-            </div>
-            <form id="upload-file-form" data-room-id="${roomIds.join(',')}">
-                <input type="file" id="support-file" name="support-file" accept=".pdf,.doc,.docx,.jpg,.png" required class="mb-4 block w-full">
-                <div class="flex justify-end space-x-3">
-                    <button type="button" class="close-upload-btn bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300">Batal</button>
-                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-green-700">Kirim Pesanan</button>
+            <form id="booking-form" data-room-id="${roomIds.join(',')}" novalidate class="max-w-6xl w-full mx-auto">
+                <div class="space-y-4">
+                    <div>
+                        <label for="activity" class="block text-sm font-medium text-gray-700 mb-1">Nama Kegiatan</label>
+                        <input type="text" id="activity" name="activity" required 
+                            class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label for="booking-date" class="block text-sm font-medium text-gray-700 mb-1">Tanggal</label>
+                        <input type="date" id="booking-date" name="booking-date" required min="${minDateString}" 
+                            value="${dateToUse}" ${selectedDate ? 'readonly' : ''} 
+                            class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
+                            focus:outline-none focus:ring-2 focus:ring-blue-500 ${selectedDate ? 'bg-gray-100' : ''}">
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label for="start-time" class="block text-sm font-medium text-gray-700 mb-1">Jam Mulai</label>
+                            <input type="time" id="start-time" name="start-time" required 
+                                class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label for="end-time" class="block text-sm font-medium text-gray-700 mb-1">Jam Selesai</label>
+                            <input type="time" id="end-time" name="end-time" required 
+                                class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="notes" class="block text-sm font-medium text-gray-700 mb-1">Keterangan</label>
+                        <textarea id="notes" name="notes" rows="3"
+                            class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
+                            focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Tambahkan keterangan tambahan..."></textarea>
+                    </div>
+                    ${infoHTML}
+                </div>
+                <div class="mt-8 flex justify-end space-x-3">
+                    <button type="button" class="close-modal-btn bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300 font-semibold" data-back-room="${roomIds[0]}">Batal</button>
+                    <button type="button" id="next-upload-btn" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 font-semibold">Lanjutkan & Upload File</button>
                 </div>
             </form>
         `;
 
-        uploadModal.classList.remove('hidden');
-        uploadModal.classList.add('flex');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
 
-        // Tutup modal upload
-        uploadModal.querySelectorAll('.close-upload-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                uploadModal.classList.add('hidden');
-                uploadModal.classList.remove('flex');
+        // Tutup modal booking
+        modal.querySelectorAll('.close-modal-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const backRoomId = e.target.getAttribute('data-back-room');
+
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+
+                if (backRoomId) {
+                    // Kembali ke halaman pemilihan tanggal
+                  showCalendarModal(backRoomId);
+                }
             });
         });
 
-        // Submit form upload
-        document.getElementById('upload-file-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const fileInput = document.getElementById('support-file');
-            if (!fileInput.files.length) {
-                alert('Pilih file terlebih dahulu.');
+        // Klik Lanjutkan → buka modal upload file
+        document.getElementById('next-upload-btn').addEventListener('click', () => {
+            const bookingForm = document.getElementById('booking-form');
+            if (!bookingForm.checkValidity()) {
+                bookingForm.reportValidity();
                 return;
             }
 
-            const formData = new FormData();
-            formData.append('file', fileInput.files[0]);
-            if (pendingBookingData) {
-                Object.keys(pendingBookingData).forEach(key => {
-                    if (key === 'roomIds') {
-                        formData.append(key, JSON.stringify(pendingBookingData[key]));
-                    } else {
-                        formData.append(key, pendingBookingData[key]);
-                    }
-                });
-            }
+            // Simpan data booking sementara
+            pendingBookingData = {
+                roomIds: roomIds,
+                activity: bookingForm.querySelector('#activity').value,
+                date: bookingForm.querySelector('#booking-date').value,
+                start: bookingForm.querySelector('#start-time').value,
+                end: bookingForm.querySelector('#end-time').value,
+                notes: bookingForm.querySelector('#notes').value
+            };
 
-            uploadModal.classList.add('hidden');
-            uploadModal.classList.remove('flex');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
 
-            const successModal = document.getElementById('upload-success-modal');
-            const fileName = fileInput.files[0].name;
-            document.getElementById('upload-file-name').textContent = `File "${fileName}" berhasil diunggah.`;
-            successModal.classList.remove('hidden');
-            successModal.classList.add('flex');
-
-            document.getElementById('upload-modal-close').addEventListener('click', () => {
-                successModal.classList.add('hidden');
-                successModal.classList.remove('flex');
-            });
-
-            pendingBookingData = null;
+            // Tampilkan modal upload file
+            document.getElementById('upload-file-modaldua').classList.remove('hidden');
+            document.getElementById('upload-file-modaldua').classList.add('flex');
         });
     }
+
+    // ==========================
+    // Event Modal Upload File
+    // ==========================
+    document.querySelectorAll('.close-upload-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.getElementById('upload-file-modaldua').classList.add('hidden');
+            document.getElementById('upload-file-modaldua').classList.remove('flex');
+        });
+    });
+
+    document.getElementById('upload-file-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const fileInput = document.getElementById('support-file');
+        if (!fileInput.files.length) {
+            alert('Pilih file terlebih dahulu.');
+            return;
+        }
+
+        // Simpan form + file (opsional kirim ke server)
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+        if (pendingBookingData) {
+            Object.keys(pendingBookingData).forEach(key => {
+                if (key === 'roomIds') {
+                    formData.append(key, JSON.stringify(pendingBookingData[key]));
+                } else {
+                    formData.append(key, pendingBookingData[key]);
+                }
+            });
+        }
+
+        // Tutup modal upload
+        document.getElementById('upload-file-modaldua').classList.add('hidden');
+        document.getElementById('upload-file-modaldua').classList.remove('flex');
+
+        // Tampilkan modal sukses
+        document.getElementById('upload-file-name').textContent = `File "${fileInput.files[0].name}" berhasil diunggah.`;
+        document.getElementById('upload-file-name').textContent = `File "${fileInput.files[0].name}" berhasil diunggah.`;
+        document.getElementById('upload-success-modal').classList.remove('hidden');
+        document.getElementById('upload-success-modal').classList.add('flex');
+
+        // Reset data booking
+        pendingBookingData = null;
+    });
+
+    // ==========================
+    // Event Modal Sukses Upload
+    // ==========================
+    document.getElementById('upload-modal-close').addEventListener('click', () => {
+        document.getElementById('upload-success-modal').classList.add('hidden');
+        document.getElementById('upload-success-modal').classList.remove('flex');
+    });
 
     function showRoomModal(roomId = null) {
         const isEdit = roomId !== null;
@@ -1868,7 +2001,27 @@ ${diagramSyntax}
                             class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
                             focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
+
+                    <!-- Tambahan: Radio Button Jumlah Booking -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Berapa kali bisa dibooking?</label>
+                        <div class="flex items-center space-x-6">
+                            <label class="flex items-center space-x-2">
+                                <input type="radio" name="room-booking-limit" value="1" ${room.bookingLimit === 1 ? 'checked' : ''}>
+                                <span>1 kali</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="radio" name="room-booking-limit" value="2" ${room.bookingLimit === 2 ? 'checked' : ''}>
+                                <span>2 kali</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="radio" name="room-booking-limit" value="bebas" ${room.bookingLimit === 'bebas' ? 'checked' : ''}>
+                                <span>Bebas</span>
+                            </label>
+                        </div>
+                    </div>
                 </div>
+
                 <div class="mt-8 flex justify-end space-x-3">
                     <button type="button" class="close-modal-btn bg-gray-200 text-gray-800 px-4 py-2 rounded-md 
                         hover:bg-gray-300 transition-colors font-semibold">Batal</button>
@@ -1906,19 +2059,19 @@ ${diagramSyntax}
         if (!activity || !date || !start || !end) { showCustomAlert('Gagal', 'Semua kolom wajib diisi!', 'error'); return; }
         if (start >= end) { showCustomAlert('Gagal', 'Jam selesai harus setelah jam mulai!', 'error'); return; }
 
-        const conflict = bookingsData.some(b => b.roomId === roomId && b.date === date && b.status === 'Disetujui' && ((start >= b.start && start < b.end) || (end > b.start && end <= b.end) || (start <= b.start && end >= b.end)));
+        const conflict = bookingsData.some(b => b.roomId === roomId && b.date === date && b.status === 'Sudah Dijadwalkan' && ((start >= b.start && start < b.end) || (end > b.start && end <= b.end) || (start <= b.start && end >= b.end)));
         if (conflict) { showCustomAlert('Gagal', 'Ruangan sudah dipesan pada jam tersebut. Silakan pilih waktu lain.', 'error'); return; }
 
-        const newBooking = { id: 'b' + (bookingsData.length + 1).toString().padStart(3, '0'), roomId, userId: currentUser.id, activity, date, start, end, status: 'Menunggu Persetujuan' };
+        const newBooking = { id: 'b' + (bookingsData.length + 1).toString().padStart(3, '0'), roomId, userId: currentUser.id, activity, date, start, end, status: 'Sedang Ditinjau' };
         bookingsData.push(newBooking);
 
-        createNotification(currentUser.id, `Pengajuan pesanan Anda untuk "${activity}" sedang menunggu persetujuan.`);
+        createNotification(currentUser.id, `Pengajuan pesanan Anda untuk "${activity}" sedang Sedang Ditinjau.`);
         createNotification('admin01', `Ada pengajuan pesanan baru dari ${currentUser.name} untuk ${roomsData.find(r=>r.id===roomId).name}.`);
 
         document.getElementById('booking-modal').classList.add('hidden');
         renderUserDaftarPage();
         initIcons();
-        showCustomAlert('Berhasil!', `Pengajuan pesanan Anda telah dikirim dan menunggu persetujuan admin.`, 'success', true);
+        showCustomAlert('Berhasil!', `Pengajuan pesanan Anda telah dikirim dan Sedang Ditinjau admin.`, 'success', true);
     }
 
     function handleRoomFormSubmit(e) {
@@ -1968,12 +2121,12 @@ ${diagramSyntax}
         const booking = bookingsData[bookingIndex];
         const room = roomsData.find(r => r.id === booking.roomId);
 
-        if (newStatus === 'Disetujui' && oldStatus !== 'Disetujui') {
-             createNotification(booking.userId, `Pesanan Anda untuk "${booking.activity}" di ${room.name} telah disetujui.`);
-             showCustomAlert('Berhasil!', `Pesanan telah disetujui.`, 'success', true);
-        } else if (newStatus === 'Ditolak' && oldStatus !== 'Ditolak') {
-            createNotification(booking.userId, `Pesanan Anda untuk "${booking.activity}" di ${room.name} ditolak.`);
-            showCustomAlert('Berhasil!', `Pesanan telah ditolak.`, 'success', true);
+        if (newStatus === 'Sudah Dijadwalkan' && oldStatus !== 'Sudah Dijadwalkan') {
+             createNotification(booking.userId, `Pesanan Anda untuk "${booking.activity}" di ${room.name} telah Sudah Dijadwalkan.`);
+             showCustomAlert('Berhasil!', `Pesanan telah Sudah Dijadwalkan.`, 'success', true);
+        } else if (newStatus === 'Tidak Tersedia' && oldStatus !== 'Tidak Tersedia') {
+            createNotification(booking.userId, `Pesanan Anda untuk "${booking.activity}" di ${room.name} Tidak Tersedia.`);
+            showCustomAlert('Berhasil!', `Pesanan telah Tidak Tersedia.`, 'success', true);
         }
         
         renderAdminAllBookings();
@@ -2192,9 +2345,9 @@ ${diagramSyntax}
             const room = roomsData.find(r => r.id === parseInt(roomId));
             showConfirmModal('Konfirmasi Hapus', `Yakin ingin menghapus "${room.name}"? Semua pesanan terkait akan ikut terhapus.`, () => handleDeleteRoom(parseInt(roomId)));
         } else if (button.matches('.approve-booking-btn')) {
-            handleUpdateBookingStatus(bookingId, 'Disetujui');
+            handleUpdateBookingStatus(bookingId, 'Sudah Dijadwalkan');
         } else if (button.matches('.reject-booking-btn')) {
-            handleUpdateBookingStatus(bookingId, 'Ditolak');
+            handleUpdateBookingStatus(bookingId, 'Tidak Tersedia');
         } else if (button.matches('.cancel-booking-btn')) {
              showConfirmModal('Konfirmasi Pembatalan', 'Yakin ingin membatalkan pesanan ini? Aksi ini akan memberitahu pengguna.', () => handleCancelBooking(bookingId));
         } else if (button.matches('.close-modal-btn')) {
@@ -2255,25 +2408,21 @@ ${diagramSyntax}
         initIcons();
     });
 
-    const unblockModal = document.getElementById('confirmUnblockModal');
-    const unblockModalText = document.getElementById('unblockModalText');
-    const confirmUnblockBtn = document.getElementById('confirmUnblockBtn');
-    const cancelUnblockBtn = document.getElementById('cancelUnblockBtn');
-    const unblockModalCloseBtn = document.getElementById('unblock-modal-close');
-
-    let tempUnblockDate = null;
-    let tempUnblockTime = null;
-    let tempUnblockLabel = null;
-
     document.addEventListener('DOMContentLoaded', function () {
         const calendarEl = document.getElementById('calendar');
-        const timeModal = document.getElementById('timeSelectionModal');
-        const cancelBtn = document.getElementById('cancelTimeSelection');
+        const unblockModal = document.getElementById('confirmUnblockModal');
+        const unblockModalText = document.getElementById('unblockModalText');
+        const confirmUnblockBtn = document.getElementById('confirmUnblockBtn');
+        const cancelUnblockBtn = document.getElementById('cancelUnblockBtn');
+        const unblockModalCloseBtn = document.getElementById('unblock-modal-close');
+        const unblockSuccessToast = document.getElementById('unblockSuccessToast');
 
         let calendar = null;
         let currentRoomId = null;
         let blockedDates = [];
-        let tempSelectedDate = null;
+        let tempUnblockDate = null;
+        let tempUnblockTime = null;
+        let tempUnblockLabel = null;
 
         function saveBlockedDatesToSession() {
             if (currentRoomId) {
@@ -2295,7 +2444,7 @@ ${diagramSyntax}
                 calendar.addEvent({
                     title: `❌ Diblok (${item.timeLabel})`,
                     start: `${item.date}T${item.time}`,
-                    allDay: false,
+                    allDay: true,
                     backgroundColor: '#f87171',
                     borderColor: '#f87171'
                 });
@@ -2312,20 +2461,9 @@ ${diagramSyntax}
             renderBlockedEvents();
         }
 
-        // Buka modal waktu
-        function openTimeModal(date) {
-            tempSelectedDate = date;
-            timeModal.classList.remove('hidden');
-        }
-
-        // Tutup modal waktu
-        function closeTimeModal() {
-            tempSelectedDate = null;
-            timeModal.classList.add('hidden');
-        }
-        // notifikasi 
         function showUnblockSuccessToast() {
-               unblockSuccessToast.classList.remove('hidden');
+            unblockSuccessToast.classList.remove('hidden');
+            setTimeout(() => unblockSuccessToast.classList.add('hidden'), 2000);
         }
 
         document.body.addEventListener('click', function (e) {
@@ -2341,7 +2479,23 @@ ${diagramSyntax}
                         initialView: 'dayGridMonth',
                         selectable: true,
                         select: function (info) {
-                            openTimeModal(info.startStr);
+                            const date = info.startStr;
+                            const time = "00:00:00";
+                            const timeLabel = "Full Day";
+
+                            if (isBlocked(date, time)) {
+                                tempUnblockDate = date;
+                                tempUnblockTime = time;
+                                tempUnblockLabel = timeLabel;
+
+                                unblockModalText.textContent = `Tanggal ${tempUnblockDate} (${tempUnblockLabel}) sudah diblok. Batalkan?`;
+                                unblockModal.classList.remove('hidden');
+                            } else {
+                                blockedDates.push({ date, time, timeLabel });
+                                saveBlockedDatesToSession();
+                                renderBlockedEvents();
+                                console.log(`Diblok: ${date} (${timeLabel}) untuk room ID ${currentRoomId}`);
+                            }
                         }
                     });
 
@@ -2352,32 +2506,6 @@ ${diagramSyntax}
             }
         });
 
-        // Tombol batal pada modal waktu
-        cancelBtn.addEventListener('click', closeTimeModal);
-
-        // Klik salah satu waktu
-        document.querySelectorAll('.select-time-btn').forEach(button => {
-            button.addEventListener('click', function () {
-                const time = this.dataset.time;
-                const timeLabel = this.dataset.label;
-
-                if (isBlocked(tempSelectedDate, time)) {
-                    tempUnblockDate = tempSelectedDate;
-                    tempUnblockTime = time;
-                    tempUnblockLabel = timeLabel;
-
-                    unblockModalText.textContent = `Tanggal ${tempUnblockDate} jam ${tempUnblockLabel} sudah diblok. Batalkan?`;
-                    unblockModal.classList.remove('hidden');
-                } else {
-                    blockedDates.push({ date: tempSelectedDate, time, timeLabel });
-                    saveBlockedDatesToSession();
-                    renderBlockedEvents();
-                    console.log(`Diblok: ${tempSelectedDate} jam ${timeLabel} untuk room ID ${currentRoomId}`);
-                    closeTimeModal();
-                }
-            });
-        });
-
         confirmUnblockBtn.addEventListener('click', function () {
             if (tempUnblockDate && tempUnblockTime) {
                 removeBlockedDate(tempUnblockDate, tempUnblockTime);
@@ -2385,9 +2513,7 @@ ${diagramSyntax}
 
             unblockModal.classList.add('hidden');
             showUnblockSuccessToast();
-            closeTimeModal();
 
-            // Reset temp data
             tempUnblockDate = null;
             tempUnblockTime = null;
             tempUnblockLabel = null;
@@ -2395,14 +2521,12 @@ ${diagramSyntax}
 
         cancelUnblockBtn.addEventListener('click', function () {
             unblockModal.classList.add('hidden');
-
         });
 
         unblockModalCloseBtn.addEventListener('click', function () {
             unblockSuccessToast.classList.add('hidden');
         });
 
-        // Tutup modal utama
         document.getElementById('closeCalendarModal').addEventListener('click', function () {
             document.getElementById('calendarModal').classList.add('hidden');
         });
