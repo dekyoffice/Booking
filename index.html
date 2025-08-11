@@ -337,6 +337,22 @@
         </div>
     </div>
 
+     <div id="upload-success-modaldua" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-xl shadow-lg p-6 max-w-sm w-full text-center">
+            <div class="mb-4">
+                <span class="inline-block w-14 h-14 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-3xl">
+                    ✓
+                </span>
+            </div>
+            <h2 class="text-lg font-bold text-gray-800 mb-2">Upload Berhasil</h2>
+            <p class="text-gray-600 mb-4" id="upload-file-name-satu">File berhasil diunggah.</p>
+            <p class="text-gray-600 mb-4" id="upload-file-name-dua">File berhasil diunggah.</p>
+            <button id="upload-modal-close-dua" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg transition-colors">
+                OK
+            </button>
+        </div>
+    </div>
+
    <!-- Modal Upload File -->
     <div id="upload-file-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center">
         <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
@@ -364,11 +380,11 @@
             </div>
 
             <h2 class="text-2xl font-bold text-gray-800">Ruang Tengkawang</h2>
-            <form id="upload-file-form">
-            <input type="file" id="support-file" name="support-file" accept=".pdf,.doc,.docx,.jpg,.png" required class="mb-4 block w-full">
+            <form id="upload-file-form-dua">
+            <input type="file" id="support-file-satu" name="support-file" accept=".pdf,.doc,.docx,.jpg,.png" required class="mb-4 block w-full">
             <h2 class="text-2xl font-bold text-gray-800">Ruang Audio Visual</h2>
-            <form id="upload-file-form">
-            <input type="file" id="support-file" name="support-file" accept=".pdf,.doc,.docx,.jpg,.png" required class="mb-4 block w-full">
+            <form id="upload-file-form-dua">
+            <input type="file" id="support-file-dua" name="support-file" accept=".pdf,.doc,.docx,.jpg,.png" required class="mb-4 block w-full">
             <div class="flex justify-end space-x-3">
                 <button type="button" class="close-upload-btn bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300">Batal</button>
                 <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-green-700">Kirim</button>
@@ -385,7 +401,16 @@
             <button id="closeCalendarModal" class="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-xl">&times;</button>
         </div>
     </div>
-
+    <!-- Modal Konfirmasi Blokir -->
+    <div id="confirmBlockModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-xl shadow-lg p-6 max-w-sm w-full text-center">
+            <p id="blockModalText" class="mb-4 text-lg font-medium"></p>
+            <div class="flex justify-center space-x-4">
+                <button id="confirmBlockBtn" class="px-4 py-2 bg-red-500 text-white rounded-lg">Ya</button>
+                <button id="cancelBlockBtn" class="px-4 py-2 bg-gray-300 rounded-lg">Batal</button>
+            </div>
+        </div>
+    </div>
     <!-- Modal Konfirmasi Batalkan Blokiran -->
     <div id="confirmUnblockModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
         <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
@@ -1783,6 +1808,7 @@ ${diagramSyntax}
         const selectedRooms = roomsData.filter(r => roomIds.includes(r.id));
         const modal = document.getElementById('booking-modal');
         const modalContent = modal.querySelector('.modal-content');
+        const fileNameDisplay = document.getElementById('upload-file-name-dua');
 
         const minDate = new Date();
         minDate.setDate(minDate.getDate() + 1);
@@ -1790,7 +1816,7 @@ ${diagramSyntax}
         const dateToUse = selectedDate && selectedDate >= minDateString ? selectedDate : minDateString;
 
         const roomNames = selectedRooms.map(r => r.name).join(', ');
-
+        let uploadedFileNames = [];
         let infoHTML = `
             <div class="mt-4">
                 <h3 class="text-lg font-semibold mb-2">Informasi Ruangan</h3>
@@ -1909,9 +1935,10 @@ ${diagramSyntax}
         });
     });
 
-    document.getElementById('upload-file-form').addEventListener('submit', (e) => {
+    document.getElementById('upload-file-form-dua').addEventListener('submit', (e) => {
         e.preventDefault();
-        const fileInput = document.getElementById('support-file');
+        const fileInput = document.getElementById('support-file-satu');
+        const fileInput1 = document.getElementById('support-file-dua');
         if (!fileInput.files.length) {
             alert('Pilih file terlebih dahulu.');
             return;
@@ -1935,10 +1962,10 @@ ${diagramSyntax}
         document.getElementById('upload-file-modaldua').classList.remove('flex');
 
         // Tampilkan modal sukses
-        document.getElementById('upload-file-name').textContent = `File "${fileInput.files[0].name}" berhasil diunggah.`;
-        document.getElementById('upload-file-name').textContent = `File "${fileInput.files[0].name}" berhasil diunggah.`;
-        document.getElementById('upload-success-modal').classList.remove('hidden');
-        document.getElementById('upload-success-modal').classList.add('flex');
+        document.getElementById('upload-file-name-satu').textContent = `File "${fileInput.files[0].name}" berhasil diunggah.`;
+        document.getElementById('upload-file-name-dua').textContent = `File "${fileInput1.files[0].name}" berhasil diunggah.`;
+        document.getElementById('upload-success-modaldua').classList.remove('hidden');
+        document.getElementById('upload-success-modaldua').classList.add('flex');
 
         // Reset data booking
         pendingBookingData = null;
@@ -1947,9 +1974,9 @@ ${diagramSyntax}
     // ==========================
     // Event Modal Sukses Upload
     // ==========================
-    document.getElementById('upload-modal-close').addEventListener('click', () => {
-        document.getElementById('upload-success-modal').classList.add('hidden');
-        document.getElementById('upload-success-modal').classList.remove('flex');
+    document.getElementById('upload-modal-close-dua').addEventListener('click', () => {
+        document.getElementById('upload-success-modaldua').classList.add('hidden');
+        document.getElementById('upload-success-modaldua').classList.remove('flex');
     });
 
     function showRoomModal(roomId = null) {
@@ -2410,6 +2437,8 @@ ${diagramSyntax}
 
     document.addEventListener('DOMContentLoaded', function () {
         const calendarEl = document.getElementById('calendar');
+
+        // Modal unblock
         const unblockModal = document.getElementById('confirmUnblockModal');
         const unblockModalText = document.getElementById('unblockModalText');
         const confirmUnblockBtn = document.getElementById('confirmUnblockBtn');
@@ -2417,12 +2446,21 @@ ${diagramSyntax}
         const unblockModalCloseBtn = document.getElementById('unblock-modal-close');
         const unblockSuccessToast = document.getElementById('unblockSuccessToast');
 
+        // Modal block
+        const blockModal = document.getElementById('confirmBlockModal');
+        const blockModalText = document.getElementById('blockModalText');
+        const confirmBlockBtn = document.getElementById('confirmBlockBtn');
+        const cancelBlockBtn = document.getElementById('cancelBlockBtn');
+
         let calendar = null;
         let currentRoomId = null;
         let blockedDates = [];
         let tempUnblockDate = null;
         let tempUnblockTime = null;
         let tempUnblockLabel = null;
+        let tempBlockDate = null;
+        let tempBlockTime = null;
+        let tempBlockLabel = null;
 
         function saveBlockedDatesToSession() {
             if (currentRoomId) {
@@ -2461,6 +2499,12 @@ ${diagramSyntax}
             renderBlockedEvents();
         }
 
+        function addBlockedDate(date, time, label) {
+            blockedDates.push({ date, time, timeLabel: label });
+            saveBlockedDatesToSession();
+            renderBlockedEvents();
+        }
+
         function showUnblockSuccessToast() {
             unblockSuccessToast.classList.remove('hidden');
             setTimeout(() => unblockSuccessToast.classList.add('hidden'), 2000);
@@ -2484,6 +2528,7 @@ ${diagramSyntax}
                             const timeLabel = "Full Day";
 
                             if (isBlocked(date, time)) {
+                                // Tanggal sudah diblok → tanya apakah mau unblock
                                 tempUnblockDate = date;
                                 tempUnblockTime = time;
                                 tempUnblockLabel = timeLabel;
@@ -2491,10 +2536,13 @@ ${diagramSyntax}
                                 unblockModalText.textContent = `Tanggal ${tempUnblockDate} (${tempUnblockLabel}) sudah diblok. Batalkan?`;
                                 unblockModal.classList.remove('hidden');
                             } else {
-                                blockedDates.push({ date, time, timeLabel });
-                                saveBlockedDatesToSession();
-                                renderBlockedEvents();
-                                console.log(`Diblok: ${date} (${timeLabel}) untuk room ID ${currentRoomId}`);
+                                // Tanggal belum diblok → tanya konfirmasi blokir
+                                tempBlockDate = date;
+                                tempBlockTime = time;
+                                tempBlockLabel = timeLabel;
+
+                                blockModalText.textContent = `Apakah Anda yakin ingin memblokir tanggal ${tempBlockDate} (${tempBlockLabel})?`;
+                                blockModal.classList.remove('hidden');
                             }
                         }
                     });
@@ -2506,14 +2554,13 @@ ${diagramSyntax}
             }
         });
 
+        // Konfirmasi unblock
         confirmUnblockBtn.addEventListener('click', function () {
             if (tempUnblockDate && tempUnblockTime) {
                 removeBlockedDate(tempUnblockDate, tempUnblockTime);
             }
-
             unblockModal.classList.add('hidden');
             showUnblockSuccessToast();
-
             tempUnblockDate = null;
             tempUnblockTime = null;
             tempUnblockLabel = null;
@@ -2525,6 +2572,22 @@ ${diagramSyntax}
 
         unblockModalCloseBtn.addEventListener('click', function () {
             unblockSuccessToast.classList.add('hidden');
+        });
+
+        // Konfirmasi block
+        confirmBlockBtn.addEventListener('click', function () {
+            if (tempBlockDate && tempBlockTime) {
+                addBlockedDate(tempBlockDate, tempBlockTime, tempBlockLabel);
+                console.log(`Diblok: ${tempBlockDate} (${tempBlockLabel}) untuk room ID ${currentRoomId}`);
+            }
+            blockModal.classList.add('hidden');
+            tempBlockDate = null;
+            tempBlockTime = null;
+            tempBlockLabel = null;
+        });
+
+        cancelBlockBtn.addEventListener('click', function () {
+            blockModal.classList.add('hidden');
         });
 
         document.getElementById('closeCalendarModal').addEventListener('click', function () {
