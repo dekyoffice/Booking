@@ -12,6 +12,7 @@
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+
     <style>
         body { font-family: 'Inter', sans-serif; }
         ::-webkit-scrollbar { width: 8px; height: 8px; }
@@ -82,30 +83,200 @@
             color: #f59e0b; /* amber-500 */
         }
         .star-rating input { display: none; }
+
+        /* === Background Gradient & Dekorasi === */
+        #login-screen {
+            position: relative;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+        }
+        #login-screen .subtitle {
+            font-size: 1.05rem;
+            font-weight: 500;
+            color: #0f172a;
+            margin-bottom: 1.5rem;
+        }
+        #login-screen .bg-gradient-to-br {
+            position: absolute;
+            inset: 0;
+        }
+
+        #login-screen .bg-blue-200,
+        #login-screen .bg-blue-300 {
+            filter: blur(80px);
+        }
+
+        /* === Card Login === */
+        #login-screen .login-card {
+            position: relative;
+            background: white;
+            padding: 2.5rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+            border: 1px solid #e0e7ff;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        /* Animasi masuk */
+        @keyframes fadeInUp {
+            from { 
+                opacity: 0; 
+                transform: translateY(40px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+
+        /* === Icon Header === */
+        #login-screen .icon-header {
+            width: 80px;
+            height: 80px;
+            background: #e0f2fe;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.05);
+        }
+
+        /* === Title === */
+        #login-screen h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-bottom: 0.75rem;
+        }
+
+        #login-screen p {
+            font-size: 0.95rem;
+            color: #64748b;
+            margin-bottom: 2rem;
+        }
+
+        /* === Tombol Login === */
+        #login-screen .btn-login {
+            width: 100%;
+            padding: 0.85rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border: none;
+            cursor: pointer;
+        }
+
+        #login-asn {
+            background: linear-gradient(90deg, #2563eb, #1e40af);
+        }
+
+        #login-asn:hover {
+            background: linear-gradient(90deg, #1e40af, #1e3a8a);
+            transform: scale(1.05);
+            box-shadow: 0 6px 16px rgba(37,99,235,0.4);
+        }
+
+        #login-publik {
+            background: linear-gradient(90deg, #374151, #111827);
+        }
+
+        #login-publik:hover {
+            background: linear-gradient(90deg, #111827, #000000);
+            transform: scale(1.05);
+            box-shadow: 0 6px 16px rgba(17,24,39,0.4);
+        }
+
+
+        /* === Responsif === */
+        @media (max-width: 480px) {
+            #login-screen .login-card {
+                padding: 1.5rem;
+            }
+
+            #login-screen h1 {
+                font-size: 1.25rem;
+            }
+        }
+        @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn {
+        animation: fadeIn 0.3s ease-out;
+        }
         
     </style>
 </head>
 <body class="bg-gray-100 antialiased">
 
     <!-- === LAYAR LOGIN=== -->
-    <div id="login-screen" class="active items-center justify-center h-screen w-screen p-4">
-        <div class="bg-white p-8 sm:p-10 rounded-xl shadow-2xl text-center max-w-md w-full transition-all">
-            <div class="mx-auto mb-6 h-16 w-16 flex items-center justify-center rounded-full bg-blue-100">
-                <span class="h-8 w-8 hero-icon text-blue-600" data-icon="calendar-days"></span>
-            </div>
-            <h1 class="text-2xl font-bold text-blue-900 mb-4">Layanan Pemesanan Ruangan Rapat Fisik dan Digital</h1>
-            <p class="text-gray-600 mb-8">Silakan masuk sesuai peran Anda</p>
-            <div class="space-y-4">
-                <button id="login-asn" class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg">
-                    Masuk menggunakan SSO ASN
-                </button>
-                <button id="login-publik" class="w-full bg-gray-800 text-white py-3 rounded-lg font-semibold hover:bg-gray-900 transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg">
-                    Masuk Menggunakan SSO Publik
-                </button>
-            </div>
-        </div>
+<div id="login-screen" class="active flex flex-col items-center justify-center min-h-screen w-screen p-4 relative overflow-hidden" 
+     style="background: url('/kantor-gubernur.png') center/cover no-repeat;">
+    
+    <!-- Lapisan overlay gelap transparan agar teks tetap terbaca -->
+    <div class="absolute inset-0 bg-white bg-opacity-70 pointer-events-none"></div>
+
+    <!-- Gambar blob dekorasi tambahan -->
+    <div class="absolute inset-0 pointer-events-none">
+        <div class="absolute -top-10 -left-10 w-64 h-64 bg-blue-200 rounded-full opacity-30 blur-3xl"></div>
+        <div class="absolute bottom-0 right-0 w-72 h-72 bg-blue-300 rounded-full opacity-20 blur-3xl"></div>
     </div>
 
+    <!-- Gambar di atas -->
+    <div class="mb-6 relative z-10">
+        <img src="/logo-prov.png" alt="Logo Kalimantan Barat" class="mx-auto h-40 w-auto" />
+    </div>
+
+    <!-- Teks di atas card -->
+    <div class="text-center mb-8 px-4 max-w-xl relative z-10">
+        <h1 class="text-3xl font-bold text-blue-900 mb-2">
+            Layanan Pemesanan Ruangan Rapat Fisik dan Digital
+        </h1>
+        <p class="text-lg font-bold bg-gradient-to-r from-blue-700 via-blue-500 to-blue-700 bg-clip-text text-transparent tracking-wide">
+            Provinsi Kalimantan Barat
+        </p>
+    </div>
+
+    <!-- Card Login -->
+    <div class="relative flex flex-col md:flex-row gap-8 max-w-4xl w-full justify-center z-10">
+        <!-- Card Login SSO ASN -->
+        <div class="bg-white p-8 rounded-2xl shadow-2xl text-center border border-blue-100 flex-1 max-w-md mx-auto">
+            <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" 
+                 alt="Login Icon" 
+                 class="w-20 h-20 mx-auto mb-4">
+            <h2 class="text-xl font-bold text-blue-900 mb-4">Masuk dengan SSO ASN</h2>
+            <p class="text-gray-500 mb-6">Login untuk Aparatur Sipil Negara</p>
+            <button id="login-asn"
+                class="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-blue-800 transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg flex items-center justify-center gap-2">
+                <span class="hero-icon" data-icon="id-card"></span> Masuk dengan SSO ASN
+            </button>
+        </div>
+
+        <!-- Card Login SSO Publik -->
+        <div class="bg-white p-8 rounded-2xl shadow-2xl text-center border border-gray-200 flex-1 max-w-md mx-auto">
+            <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" 
+                 alt="Login Icon" 
+                 class="w-20 h-20 mx-auto mb-4">
+            <h2 class="text-xl font-bold text-blue-900 mb-4">Masuk dengan SSO Publik</h2>
+            <p class="text-gray-500 mb-6">Login untuk pengguna umum</p>
+            <button id="login-publik"
+                class="w-full bg-gradient-to-r from-gray-800 to-gray-900 text-white py-3 rounded-lg font-semibold hover:from-gray-900 hover:to-black transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg flex items-center justify-center gap-2">
+                <span class="hero-icon" data-icon="user"></span> Masuk dengan SSO Publik
+            </button>
+        </div>
+    </div>
+</div>
     <!-- === FORM LOGIN ASN === -->
     <div id="form-login-asn" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div class="bg-white p-6 rounded-xl w-full max-w-md shadow-lg text-center">
@@ -354,45 +525,85 @@
     </div>
 
    <!-- Modal Upload File -->
-    <div id="upload-file-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center">
+    <div id="upload-file-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+        <div class="bg-white p-6 rounded-xl shadow-lg w-full max-w-lg animate-fadeIn">
+            
+            <!-- Header -->
+            <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-gray-800">Upload Dokumen Pendukung</h2>
+            <button class="close-upload-btn text-gray-400 hover:text-gray-600 text-3xl leading-none">&times;</button>
+            </div>
+
+            <!-- Room Title -->
+            <h4 class="text-lg font-semibold text-gray-700 mb-1">Ruang Tengkawang</h4>
+            <p class="text-sm text-gray-500 mb-4">Pilih file (.pdf, .doc, .jpg, .png)</p>
+
+            <!-- Form -->
+            <form id="upload-file-form" class="space-y-5">
+            <!-- File Input Box -->
+            <label for="support-file" class="block border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-8 w-8 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 008 0m-4-4v8m0-8V4m0 8l-3-3m3 3l3-3" />
+                </svg>
+                <span id="file-label" class="text-gray-500">Klik untuk memilih file</span>
+                <input type="file" id="support-file" name="support-file" accept=".pdf,.doc,.docx,.jpg,.png" class="hidden" required>
+            </label>
+
+            <!-- Buttons -->
+            <div class="flex justify-end space-x-3">
+                <button type="button" class="close-upload-btn bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300">Batal</button>
+                <button type="submit" class="bg-gradient-to-r from-blue-500 to-green-500 text-white px-4 py-2 rounded-md hover:opacity-90">Kirim</button>
+            </div>
+            </form>
+        </div>
+    </div>
+    <div id="upload-file-modaldua" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
         <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
+            
+            <!-- Header -->
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-2xl font-bold text-gray-800">Upload Dokumen Pendukung</h2>
                 <button class="close-upload-btn text-gray-400 hover:text-gray-600 text-3xl leading-none">&times;</button>
             </div>
 
-            <h4 class="text-2xl font-bold text-gray-800">Ruang Tengkawang</h2>
-            <form id="upload-file-form">
-            <input type="file" id="support-file" name="support-file" accept=".pdf,.doc,.docx,.jpg,.png" required class="mb-4 block w-full">
-            <div class="flex justify-end space-x-3">
-                <button type="button" class="close-upload-btn bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300">Batal</button>
-                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-green-700">Kirim</button>
-            </div>
+            <!-- Form -->
+            <form id="upload-file-form-dua" class="space-y-6">
+                
+                <!-- Ruang Tengkawang -->
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-700 mb-2">Ruang Tengkawang</h3>
+                    <p class="text-sm text-gray-500 mb-2">Pilih file (.pdf, .doc, .jpg, .png)</p>
+                    <label for="support-file-satu" class="border-2 border-dashed border-gray-300 rounded-lg p-4 flex flex-col items-center justify-center text-gray-500 hover:border-blue-400 cursor-pointer transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4-4m0 0l-4 4m4-4v12" />
+                        </svg>
+                        <span id="file-name-satu">Klik untuk memilih file</span>
+                    </label>
+                    <input type="file" id="support-file-satu" name="support-file-satu" accept=".pdf,.doc,.docx,.jpg,.png" class="hidden" required>
+                </div>
+
+                <!-- Ruang Audio Visual -->
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-700 mb-2">Ruang Audio Visual</h3>
+                    <p class="text-sm text-gray-500 mb-2">Pilih file (.pdf, .doc, .jpg, .png)</p>
+                    <label for="support-file-dua" class="border-2 border-dashed border-gray-300 rounded-lg p-4 flex flex-col items-center justify-center text-gray-500 hover:border-green-400 cursor-pointer transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4-4m0 0l-4 4m4-4v12" />
+                        </svg>
+                        <span id="file-name-dua">Klik untuk memilih file</span>
+                    </label>
+                    <input type="file" id="support-file-dua" name="support-file-dua" accept=".pdf,.doc,.docx,.jpg,.png" class="hidden" required>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex justify-end space-x-3">
+                    <button type="button" class="close-upload-btn bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300">Batal</button>
+                    <button type="submit" class="bg-gradient-to-r from-blue-500 to-green-500 text-white px-4 py-2 rounded-md hover:opacity-90">Kirim</button>
+                </div>
+             
             </form>
         </div>
     </div>
-
-    <div id="upload-file-modaldua" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center">
-        <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold text-gray-800">Upload Dokumen Pendukung</h2>
-                <button class="close-upload-btn text-gray-400 hover:text-gray-600 text-3xl leading-none">&times;</button>
-            </div>
-
-            <h2 class="text-2xl font-bold text-gray-800">Ruang Tengkawang</h2>
-            <form id="upload-file-form-dua">
-            <input type="file" id="support-file-satu" name="support-file" accept=".pdf,.doc,.docx,.jpg,.png" required class="mb-4 block w-full">
-            <h2 class="text-2xl font-bold text-gray-800">Ruang Audio Visual</h2>
-            <form id="upload-file-form-dua">
-            <input type="file" id="support-file-dua" name="support-file" accept=".pdf,.doc,.docx,.jpg,.png" required class="mb-4 block w-full">
-            <div class="flex justify-end space-x-3">
-                <button type="button" class="close-upload-btn bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300">Batal</button>
-                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-green-700">Kirim</button>
-            </div>
-            </form>
-        </div>
-    </div>
-
     <!-- Modal Kalender Admin -->
     <div id="calendarModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
         <div class="bg-white rounded-lg shadow-lg w-full max-w-lg p-6 relative">
@@ -723,16 +934,20 @@ const blockedDates = [
         const modal = document.getElementById('calendar-modal');
         const container = modal.querySelector('.modal-content');
         if (!container) return;
-        
+
         const room = roomId ? roomsData.find(r => r.id === roomId) : null;
         const monthName = calendarDate.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
         let headerHTML = `
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-2xl font-bold text-gray-800">${room ? `Kalender Ketersediaan - ${room.name}` : 'Kalender Ketersediaan'}</h2>
                 <div class="flex items-center space-x-2">
-                    <button id="calendar-prev-month-btn" class="p-2 rounded-full hover:bg-gray-200 transition-colors"><span class="hero-icon h-5 w-5 text-gray-600" data-icon="chevron-left"></span></button>
+                    <button id="calendar-prev-month-btn" class="p-2 rounded-full hover:bg-gray-200 transition-colors">
+                        <span class="hero-icon h-5 w-5 text-gray-600" data-icon="chevron-left"></span>
+                    </button>
                     <span class="text-lg font-semibold text-gray-700 w-48 text-center">${monthName}</span>
-                    <button id="calendar-next-month-btn" class="p-2 rounded-full hover:bg-gray-200 transition-colors"><span class="hero-icon h-5 w-5 text-gray-600" data-icon="chevron-right"></span></button>
+                    <button id="calendar-next-month-btn" class="p-2 rounded-full hover:bg-gray-200 transition-colors">
+                        <span class="hero-icon h-5 w-5 text-gray-600" data-icon="chevron-right"></span>
+                    </button>
                 </div>
                 <button class="close-modal-btn text-gray-400 hover:text-gray-600 text-3xl leading-none">&times;</button>
             </div>
@@ -820,23 +1035,56 @@ const blockedDates = [
         container.innerHTML = headerHTML + gridHTML;
         initIcons();
 
+        // Tangani tombol close modal dengan stopPropagation supaya tidak memicu klik tanggal
+        const closeBtn = container.querySelector('.close-modal-btn');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', (event) => {
+                event.stopPropagation();  // cegah bubbling ke elemen lain
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+
+                // Reset multi booking / tampilan awal, sesuaikan ini dengan fungsi resetmu
+                if (typeof resetMultiBooking === 'function') {
+                    resetMultiBooking();
+                }
+            });
+        }
+
+        // Event klik tanggal di kalender
         const dateCells = container.querySelectorAll('[data-date]');
         dateCells.forEach(cell => {
-            cell.addEventListener('click', function() {
+            cell.addEventListener('click', (event) => {
+                event.stopPropagation(); // cegah event bubbling ganda
+
                 if (cell.getAttribute('data-blocked')) return;
 
-                const date = this.getAttribute('data-date');
-                const roomId = this.getAttribute('data-room-id');
+                const date = cell.getAttribute('data-date');
+                const roomId = cell.getAttribute('data-room-id');
 
-                const calendarModal = document.getElementById('calendar-modal');
-                calendarModal.classList.add('hidden');
-                calendarModal.classList.remove('flex');
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
                 currentCalendarRoomId = null;
 
                 if (roomId) showBookingModal(parseInt(roomId), date);
             });
         });
     }
+
+    function resetMultiBooking() {
+
+        document.getElementById('selected-count').textContent = '0';
+        const multiBookingBar = document.getElementById('multi-booking-bar');
+        if (multiBookingBar) multiBookingBar.classList.add('hidden');
+        const bookingModal = document.getElementById('booking-modal');
+        if (bookingModal) {
+            bookingModal.classList.add('hidden');
+            bookingModal.classList.remove('flex');
+        }
+        // Reset variabel state terkait
+        selectedRooms = [];
+        currentCalendarRoomId = null;
+    }
+
 
 
     function showCalendarModal(roomId = null) {
@@ -850,23 +1098,47 @@ const blockedDates = [
     function renderUserDaftarPage() {
         const container = document.getElementById('page-user-daftar');
         if (!container) return;
+
         const todayString = TODAY_DATE.toISOString().split('T')[0];
         const todayFormatted = TODAY_DATE.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
         let searchQuery = '';
         let selectedDinas = '';
+        let multiSelectMode = false;
+        let selectedRoomIds = []; // Variabel untuk melacak ID ruangan yang dipilih
 
-        // Ambil daftar dinas unik dari roomsData
         const dinasList = [...new Set(roomsData.map(r => r.dinas).filter(Boolean))];
 
+        // --- FUNGSI BARU UNTUK MENGHILANGKAN CHECKBOX ---
+        function clearSelectedCheckboxes() {
+            const selectedCheckboxes = document.querySelectorAll('.room-select:checked');
+            selectedCheckboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
+
+            // Sembunyikan floating bar dan reset jumlah
+            const bar = document.getElementById('multi-booking-bar');
+            const countEl = document.getElementById('selected-count');
+            
+            // Hapus kelas 'show' untuk memicu transisi ke bawah
+            if (bar.classList.contains('show')) {
+                bar.classList.remove('show');
+                setTimeout(() => {
+                    bar.classList.add('hidden');
+                }, 400); // Sembunyikan setelah animasi selesai
+            }
+            
+            countEl.textContent = 0;
+            selectedRoomIds = []; // Reset daftar ID yang dipilih
+        }
+        
         function renderRoomList() {
             let filteredRooms = roomsData
-                .filter(room => !room.hidden) // hide ruangan yang disembunyikan
+                .filter(room => !room.hidden)
                 .filter(room => {
                     const q = searchQuery.toLowerCase();
-                    const dinasMatch = selectedDinas === '' || 
-                                    (room.dinas && room.dinas.toLowerCase().includes(selectedDinas.toLowerCase()));
-
+                    const dinasMatch = selectedDinas === '' ||
+                        (room.dinas && room.dinas.toLowerCase().includes(selectedDinas.toLowerCase()));
                     return (
                         dinasMatch &&
                         (
@@ -878,119 +1150,182 @@ const blockedDates = [
                     );
                 });
 
-            let roomListHTML = filteredRooms.map(room => {
-                const todayBookings = bookingsData.filter(b => b.roomId === room.id && b.date === todayString && (b.status === 'Sudah Dijadwalkan' || b.status === 'Sedang Ditinjau'));
+            let roomListHTML = filteredRooms.map((room, index) => {
+                const todayBookings = bookingsData.filter(b =>
+                    b.roomId === room.id &&
+                    b.date === todayString &&
+                    (b.status === 'Sudah Dijadwalkan' || b.status === 'Sedang Ditinjau')
+                );
                 const isBookedToday = todayBookings.length > 0;
 
                 let statusHTML = '';
                 if (isBookedToday) {
                     const booking = todayBookings[0];
                     const user = usersData.find(u => u.id === booking.userId);
-                    const statusClass = booking.status === 'Sudah Dijadwalkan' ? 'text-green-600' : 'text-orange-600';
+                    const statusClass = booking.status === 'Sudah Dijadwalkan' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700';
                     const statusText = booking.status === 'Sudah Dijadwalkan' ? 'Sudah Dijadwalkan' : 'Menunggu';
 
                     statusHTML = `
                         <div class="text-sm mb-3 pl-6">
-                            <p class="text-gray-500">Dinas: <span class="font-medium text-gray-700">${room.dinas}</span></p>
-                            <p class="text-gray-500">Status: <span class="font-semibold ${statusClass}">${statusText}</span></p>
-                            <p class="text-gray-500">Aktivitas: <span class="font-medium text-gray-700">${booking.activity}</span></p>
-                            <p class="text-gray-500">Waktu: <span class="font-medium text-gray-700">${booking.start} - ${booking.end}</span></p>
-                            <p class="text-gray-500">Pemesan: <span class="font-medium text-gray-700">${user ? user.name : 'Unknown'}</span></p>
+                            <p class="text-gray-500">📌 Dinas: <span class="font-medium text-gray-700">${room.dinas}</span></p>
+                            <p class="text-gray-500">📅 Status: <span class="px-2 py-0.5 rounded-full text-xs font-semibold ${statusClass}">${statusText}</span></p>
+                            <p class="text-gray-500">📋 Aktivitas: <span class="font-medium text-gray-700">${booking.activity}</span></p>
+                            <p class="text-gray-500">⏰ Waktu: <span class="font-medium text-gray-700">${booking.start} - ${booking.end}</span></p>
+                            <p class="text-gray-500">👤 Pemesan: <span class="font-medium text-gray-700">${user ? user.name : 'Unknown'}</span></p>
                         </div>
                     `;
                 } else {
                     statusHTML = `
                         <div class="text-sm mb-3 pl-6">
-                            <p class="text-gray-500">Dinas: <span class="font-medium text-gray-700">${room.dinas}</span></p>
-                            <p class="text-gray-500">Status: <span class="font-semibold text-green-600">Tersedia</span></p>
+                            <p class="text-gray-500">📌 Dinas: <span class="font-medium text-gray-700">${room.dinas}</span></p>
+                            <p class="text-gray-500">📅 Status: <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700">Tersedia</span></p>
                             <p class="text-gray-500">Tidak ada jadwal untuk hari ini</p>
                         </div>
                     `;
                 }
 
-                const typeIcon = room.type === 'Fisik' ? 'building-office-2' : 'wifi';
+                const typeIcon = room.type === 'Fisik' ? '🏢' : '🌐';
+                const isChecked = selectedRoomIds.includes(room.id); // Mempertahankan status centang
+                
                 return `
-                    <div class="bg-white rounded-lg shadow-lg p-5 flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                    <div class="bg-white rounded-xl shadow-lg p-5 flex flex-col justify-between transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 animate-fadeIn" style="animation-delay:${index * 0.05}s">
                         <div>
-                            <h3 class="font-bold text-lg mb-2 text-gray-800">${room.name}</h3>
+                            <h3 class="font-bold text-lg mb-2 text-gray-800 flex items-center gap-2">${typeIcon} ${room.name}</h3>
                             <div class="flex items-center text-sm mb-1 text-gray-500">
-                                <span class="hero-icon h-4 w-4 mr-2 text-gray-400" data-icon="${typeIcon}"></span>
+                                <span class="mr-1">📄</span>
                                 Tipe: <span class="font-medium text-gray-700 ml-1">${room.type}</span>
                             </div>
-                            <p class="text-sm mb-1 text-gray-500 pl-6">Kapasitas: ${room.capacity} ${room.type === 'Fisik' ? 'orang' : 'peserta'}</p>
+                            <p class="text-sm mb-1 text-gray-500 pl-6">👥 Kapasitas: ${room.capacity} ${room.type === 'Fisik' ? 'orang' : 'peserta'}</p>
                             ${statusHTML}
                         </div>
                         <div class="flex items-center justify-between mt-4">
-                            <input type="checkbox" class="room-select mr-2 w-6 h-6 accent-blue-600 cursor-pointer" value="${room.id}">
-                            <button data-room-id="${room.id}" class="open-room-calendar-btn bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md">Pesan</button>
+                            ${multiSelectMode
+                                ? `<input type="checkbox" class="room-select mr-2 w-6 h-6 accent-blue-600 cursor-pointer" value="${room.id}" ${isChecked ? 'checked' : ''}>`
+                                : `<button data-room-id="${room.id}" class="open-room-calendar-btn bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 px-4 py-2 rounded-md shadow-md transition-all duration-300">Pesan</button>`
+                            }
                         </div>
                     </div>`;
             }).join('');
 
             document.getElementById('room-list-container').innerHTML = roomListHTML;
 
-            // Event untuk checkbox
-            document.querySelectorAll('.room-select').forEach(checkbox => {
-                checkbox.addEventListener('change', () => {
-                    const selected = document.querySelectorAll('.room-select:checked');
-                    document.getElementById('selected-count').textContent = selected.length;
-                    document.getElementById('multi-booking-bar').classList.toggle('hidden', selected.length === 0);
+            if (multiSelectMode) {
+                const bar = document.getElementById('multi-booking-bar');
+                const countEl = document.getElementById('selected-count');
+
+                document.querySelectorAll('.room-select').forEach(checkbox => {
+                    checkbox.addEventListener('change', () => {
+                        const selected = document.querySelectorAll('.room-select:checked');
+                        selectedRoomIds = Array.from(selected).map(cb => parseInt(cb.value));
+                        countEl.textContent = selectedRoomIds.length;
+
+                        if (selectedRoomIds.length > 0) {
+                            bar.classList.add('show');
+                            bar.classList.remove('hidden');
+                        } else {
+                            bar.classList.remove('show');
+                            setTimeout(() => {
+                                bar.classList.add('hidden');
+                            }, 400);
+                        }
+                    });
                 });
-            });
+                // Perbarui jumlah saat render, untuk kasus ketika user kembali ke halaman
+                const selected = document.querySelectorAll('.room-select:checked');
+                selectedRoomIds = Array.from(selected).map(cb => parseInt(cb.value));
+                countEl.textContent = selectedRoomIds.length;
+                if (selectedRoomIds.length > 0) {
+                    bar.classList.add('show');
+                    bar.classList.remove('hidden');
+                } else {
+                    bar.classList.remove('show');
+                }
+            }
         }
 
-        // HTML utama
         container.innerHTML = `
-            <h1 class="text-2xl lg:text-3xl font-bold mb-6 text-gray-800">Daftar Ruangan Rapat</h1>
-            <div class="mb-4 flex justify-end gap-2">
-                <div class="relative w-full sm:w-80">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">🔍</span>
-                    <input type="text" id="search-room" placeholder="Cari ruangan..." 
-                        class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            <h1 class="text-2xl lg:text-3xl font-bold mb-6 text-gray-800 flex items-center gap-2">
+                Daftar Ruangan Rapat
+            </h1>
+            <div class="mb-4 flex flex-wrap justify-between gap-2 items-center">
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" id="toggle-multiselect" class="w-5 h-5 accent-blue-600">
+                    <label for="toggle-multiselect" class="text-gray-700">Pesan lebih dari 1 ruangan</label>
                 </div>
-                <!-- Dropdown Filter Dinas -->
-                <div class="relative w-full sm:w-56">
-                    <input type="text" id="filter-dinas" placeholder="Cari dinas..."
-                        list="dinas-list"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                    <datalist id="dinas-list">
-                        ${dinasList.map(d => `<option value="${d}"></option>`).join('')}
-                    </datalist>
+                <div class="flex gap-2">
+                    <div class="relative w-full sm:w-80">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">🔍</span>
+                        <input type="text" id="search-room" placeholder="Cari ruangan..." 
+                            class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition">
+                    </div>
+                    <div class="relative w-full sm:w-56">
+                        <input type="text" id="filter-dinas" placeholder="Cari dinas..."
+                            list="dinas-list"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition">
+                        <datalist id="dinas-list">
+                            ${dinasList.map(d => `<option value="${d}"></option>`).join('')}
+                        </datalist>
+                    </div>
                 </div>
             </div>
 
             <section id="room-list-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-20"></section>
-            <div id="multi-booking-bar" class="hidden fixed bottom-0 left-0 w-full bg-blue-700 p-4">
-                <button id="multi-booking-btn" class="open-room-calendar-btn w-full bg-blue-600 hover:bg-blue-700 px-4 py-3 rounded text-white text-lg font-semibold">
+            <div id="multi-booking-bar" class="multi-booking-bar hidden fixed bottom-4 left-64 right-4 bg-white text-gray-800 shadow-lg p-4 flex justify-center items-center rounded-2xl">
+                <button id="multi-booking-btn" class="open-room-calendar-btn w-full bg-blue-600 text-white hover:bg-blue-700 px-8 py-4 rounded-xl text-lg font-bold shadow-md transition duration-300 ease-in-out">
                     Pesan Sekaligus (<span id="selected-count">0</span> Ruangan)
                 </button>
             </div>
         `;
 
-        // Event search
+        // Animasi CSS
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(5px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            .animate-fadeIn { animation: fadeIn 0.4s ease forwards; }
+            
+            .multi-booking-bar {
+                transform: translateY(100%);
+                transition: transform 0.4s cubic-bezier(.34,1.56,.64,1);
+            }
+            .multi-booking-bar.show {
+                transform: translateY(0);
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Event Listeners
+        document.getElementById('toggle-multiselect').addEventListener('change', (e) => {
+            multiSelectMode = e.target.checked;
+            if (!multiSelectMode) {
+                clearSelectedCheckboxes(); // Hapus centang saat mode dimatikan
+            }
+            renderRoomList();
+        });
+
         document.getElementById('search-room').addEventListener('input', (e) => {
             searchQuery = e.target.value;
             renderRoomList();
         });
 
-        // Event filter dinas
         document.getElementById('filter-dinas').addEventListener('input', (e) => {
             selectedDinas = e.target.value;
             renderRoomList();
         });
-
-        // Render awal
+        
+        // Perbaikan: Pastikan renderRoomList dipanggil setelah semua elemen dimuat
         renderRoomList();
 
-        // Event tombol "Pesan Sekaligus"
         document.getElementById('multi-booking-btn').addEventListener('click', () => {
-            const selectedIds = Array.from(document.querySelectorAll('.room-select:checked')).map(cb => parseInt(cb.value));
-            if (selectedIds.length > 0) {
-                showBookingModal2(selectedIds);
+            if (selectedRoomIds.length > 0) {
+                showBookingModal2(selectedRoomIds);
+                clearSelectedCheckboxes();
             }
         });
-    }
 
+    }
     function renderEmptyState(title, message, icon) {
         return `
             <div class="text-center p-10 mt-8 text-gray-500 bg-white rounded-lg shadow-md">
@@ -1001,101 +1336,241 @@ const blockedDates = [
         `;
     }
 
-    function renderUserRiwayatPage() {
-        const container = document.getElementById('page-user-riwayat');
-        if (!container) return;
+  function renderUserRiwayatPage() {
+    const container = document.getElementById('page-user-riwayat');
+    if (!container) return;
 
-        const myBookings = bookingsData
-            .filter(b => b.userId === currentUser.id)
-            .sort((a, b) => new Date(b.date) - new Date(a.date));
+    const myBookings = bookingsData
+        .filter(b => b.userId === currentUser.id)
+        .sort((a, b) => new Date(b.date) - new Date(a.date));
 
-        let listHTML = '';
-        if (myBookings.length === 0) {
-            listHTML = renderEmptyState('Belum Ada Riwayat', 'Anda belum pernah membuat pesanan.', 'document-duplicate');
-        } else {
-            listHTML = myBookings.map(booking => {
-                const room = roomsData.find(r => r.id === booking.roomId);
-                const status = getBookingStatus(booking);
-                const hasFeedback = feedbackData.some(f => f.bookingId === booking.id);
-                
-                let feedbackButton = '';
-                if (status.text === 'Selesai' && !hasFeedback) {
-                    feedbackButton = `<button data-booking-id="${booking.id}" class="open-feedback-modal-btn mt-2 sm:mt-0 sm:ml-4 text-sm bg-blue-100 text-blue-700 font-semibold py-1 px-3 rounded-md hover:bg-blue-200 transition-colors">Beri Penilaian</button>`;
-                }
+    let listHTML = '';
+    if (myBookings.length === 0) {
+        listHTML = renderEmptyState('Belum Ada Riwayat', 'Anda belum pernah membuat pesanan.', 'document-duplicate');
+    } else {
+        listHTML = myBookings.map(booking => {
+            const room = roomsData.find(r => r.id === booking.roomId);
+            const status = getBookingStatus(booking);
+            const hasFeedback = feedbackData.some(f => f.bookingId === booking.id);
 
-                let uploadButton = '';
-                if (status.text === 'Sudah Dijadwalkan' || status.text === 'Selesai') {
-                    uploadButton = `
-                        <label class="ml-4 cursor-pointer bg-green-100 text-green-700 font-semibold py-1 px-3 rounded-md hover:bg-green-200 transition-colors text-sm">
-                            Upload File
-                            <input type="file" data-booking-id="${booking.id}" class="hidden booking-file-input" accept=".pdf,.doc,.docx,.jpg,.png">
-                        </label>
-                    `;
-                }
+            let feedbackButton = '';
+            if (status.text === 'Selesai' && !hasFeedback) {
+                feedbackButton = `<button data-booking-id="${booking.id}" class="open-feedback-modal-btn mt-2 sm:mt-0 sm:ml-4 text-sm bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold py-1 px-3 rounded-md hover:from-blue-600 hover:to-blue-700 transition-colors shadow-sm">⭐ Beri Penilaian</button>`;
+            }
 
-                return `
-                    <div class="bg-white p-4 rounded-lg shadow-md mb-4 flex flex-col sm:flex-row sm:justify-between sm:items-center">
-                        <div class="flex-grow mb-4 sm:mb-0">
-                            <p class="font-bold text-gray-800">${room.name}</p>
-                            <p class="text-sm text-gray-600">${booking.activity}</p>
-                            <p class="text-sm text-gray-500 mt-1">
-                                ${new Date(booking.date).toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'})} | ${booking.start} - ${booking.end}
-                            </p>
-                        </div>
-                        <div class="flex-shrink-0 flex items-center">
-                            <span class="px-3 py-1 text-xs font-semibold rounded-full ${status.class}">${status.text}</span>
-                            ${feedbackButton}
-                            ${uploadButton}
-                        </div>
-                    </div>
+            let uploadButton = '';
+            if (status.text === 'Sudah Dijadwalkan' || status.text === 'Selesai') {
+                uploadButton = `
+                    <label class="ml-4 cursor-pointer bg-green-100 text-green-700 font-semibold py-1 px-3 rounded-md hover:bg-green-200 transition-colors text-sm">
+                        Upload File
+                        <input type="file" data-booking-id="${booking.id}" class="hidden booking-file-input" accept=".pdf,.doc,.docx,.jpg,.png">
+                    </label>
                 `;
-            }).join('');
-        }
+            }
 
-        container.innerHTML = `
-            <h1 class="text-2xl lg:text-3xl font-bold mb-6 text-gray-800">Riwayat Pesanan Saya</h1>
-            <div>${listHTML}</div>
-        `;
+            return `
+                <div class="bg-white p-4 rounded-lg shadow-md mb-4 flex flex-col sm:flex-row sm:justify-between sm:items-center">
+                    <div class="flex-grow mb-4 sm:mb-0">
+                        <p class="font-bold text-gray-800">${room.name}</p>
+                        <p class="text-sm text-gray-600">${booking.activity}</p>
+                        <p class="text-sm text-gray-500 mt-1">
+                            ${new Date(booking.date).toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'})} | ${booking.start} - ${booking.end}
+                        </p>
+                    </div>
+                    <div class="flex-shrink-0 flex items-center">
+                        <span class="px-3 py-1 text-xs font-semibold rounded-full ${status.class}">${status.text}</span>
+                        ${feedbackButton}
+                        ${uploadButton}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
 
-        // Event untuk upload file
-        document.querySelectorAll('.booking-file-input').forEach(input => {
-            input.addEventListener('change', (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                    // Tampilkan modal notifikasi
-                    document.getElementById('upload-file-name').textContent = `File "${file.name}" berhasil diunggah.`;
-                    document.getElementById('upload-success-modal').classList.remove('hidden');
-                }
+    container.innerHTML = `
+        <h1 class="text-2xl lg:text-3xl font-bold mb-6 text-gray-800">Riwayat Pesanan Saya</h1>
+        <div>${listHTML}</div>
+
+        <!-- Modal Penilaian -->
+        <div id="feedback-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+            <div class="bg-white p-6 rounded-xl shadow-lg w-full max-w-md transform scale-95 opacity-0 transition-all duration-300" id="feedback-modal-content">
+                <h2 class="text-xl font-bold mb-4 text-gray-800">Beri Penilaian</h2>
+
+                <!-- Rating Bintang -->
+                <div id="feedback-stars" class="flex gap-2 text-3xl mb-4">
+                    ${[1,2,3,4,5].map(star => `<span data-star="${star}" class="cursor-pointer text-gray-300 hover:text-yellow-400 transition-colors">★</span>`).join('')}
+                </div>
+
+                <!-- Komentar -->
+                <textarea id="feedback-comment" rows="4" class="w-full border border-gray-300 rounded-lg p-3 mb-4 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Tulis komentar Anda..."></textarea>
+
+                <!-- Tombol -->
+                <div class="flex justify-end gap-2">
+                    <button id="feedback-cancel" class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition-colors">Batal</button>
+                    <button id="feedback-submit" class="px-4 py-2 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 shadow-md">Kirim</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notifikasi Penilaian -->
+       <div id="feedback-notification" 
+            class="fixed bottom-8 right-8 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50"
+            style="display:none;">
+            Terima kasih atas penilaian Anda!
+        </div>
+
+    `;
+
+    // Event Upload File
+    document.querySelectorAll('.booking-file-input').forEach(input => {
+        input.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                document.getElementById('upload-file-name').textContent = `File "${file.name}" berhasil diunggah.`;
+                document.getElementById('upload-success-modal').classList.remove('hidden');
+            }
+        });
+    });
+
+    document.getElementById('upload-modal-close')?.addEventListener('click', () => {
+        document.getElementById('upload-success-modal').classList.add('hidden');
+    });
+
+    // Event Modal Penilaian
+    let selectedBookingId = null;
+    let selectedRating = 0;
+
+    document.querySelectorAll('.open-feedback-modal-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            selectedBookingId = btn.getAttribute('data-booking-id');
+            selectedRating = 0;
+            document.querySelectorAll('#feedback-stars span').forEach(s => s.classList.remove('text-yellow-400'));
+            document.getElementById('feedback-comment').value = '';
+            document.getElementById('feedback-modal').classList.remove('hidden');
+
+            // Efek animasi pop up
+            const modalContent = document.getElementById('feedback-modal-content');
+            setTimeout(() => {
+                modalContent.classList.remove('scale-95', 'opacity-0');
+                modalContent.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        });
+    });
+
+    document.getElementById('feedback-cancel').addEventListener('click', () => {
+        document.getElementById('feedback-modal').classList.add('hidden');
+    });
+
+    // Pilih Rating
+    document.querySelectorAll('#feedback-stars span').forEach(starEl => {
+        starEl.addEventListener('click', () => {
+            selectedRating = parseInt(starEl.getAttribute('data-star'));
+            document.querySelectorAll('#feedback-stars span').forEach(s => {
+                s.classList.toggle('text-yellow-400', parseInt(s.getAttribute('data-star')) <= selectedRating);
+                s.classList.toggle('text-gray-300', parseInt(s.getAttribute('data-star')) > selectedRating);
             });
         });
+    });
 
-        // Event tutup modal
-        document.getElementById('upload-modal-close').addEventListener('click', () => {
-            document.getElementById('upload-success-modal').classList.add('hidden');
-        });
+    // Submit Feedback
+    document.getElementById('feedback-submit').addEventListener('click', () => {
+    const comment = document.getElementById('feedback-comment').value.trim();
+    if (selectedRating === 0) {
+        alert('Pilih rating terlebih dahulu.');
+        return;
     }
+    feedbackData.push({
+        bookingId: selectedBookingId,
+        rating: selectedRating,
+        comment: comment,
+        date: new Date().toISOString()
+    });
+    document.getElementById('feedback-modal').classList.add('hidden');
 
-    function renderUserNotifikasiPage() {
-        const container = document.getElementById('page-user-notifikasi');
-        if (!container) return;
-        const myNotifications = notificationsData.filter(n => n.userId === currentUser.id || n.userId === 'all').sort((a, b) => new Date(b.rawTime) - new Date(a.rawTime));
-        let listHTML;
-        if (myNotifications.length === 0) {
-            listHTML = renderEmptyState('Tidak Ada Notifikasi', 'Kotak masuk Anda kosong.', 'inbox-arrow-down');
-        } else {
-            listHTML = myNotifications.map(notif => {
+    // Tampilkan notifikasi secara sederhana
+    const notif = document.getElementById('feedback-notification');
+    notif.style.display = 'block';  // tampilkan notif
+
+    setTimeout(() => {
+        notif.style.display = 'none';  // sembunyikan notif setelah 3 detik
+    }, 3000);
+
+    renderUserRiwayatPage();
+});
+
+}
+
+function renderUserNotifikasiPage() {
+    const container = document.getElementById('page-user-notifikasi');
+    if (!container) return;
+
+    const myNotifications = notificationsData
+        .filter(n => n.userId === currentUser.id || n.userId === 'all')
+        .sort((a, b) => new Date(b.rawTime) - new Date(a.rawTime));
+
+    let listHTML;
+
+    if (myNotifications.length === 0) {
+        listHTML = renderEmptyState(
+            'Tidak Ada Notifikasi',
+            'Kotak masuk Anda kosong.',
+            'inbox-arrow-down'
+        );
+    } else {
+        listHTML = myNotifications
+            .map((notif, index) => {
                 const bgClass = notif.read ? 'bg-white' : 'bg-blue-50';
-                return `<div class="p-4 border-b ${bgClass} hover:bg-gray-100 transition-colors duration-200">
-                    <p class="text-gray-800 text-sm">${notif.message}</p>
-                    <p class="text-xs text-gray-500 mt-1">${notif.time}</p>
-                </div>`;
-            }).join('');
-        }
+                const badge = !notif.read
+                    ? `<span class="ml-2 px-2 py-0.5 text-xs bg-red-500 text-white rounded-full animate-pulse">Baru</span>`
+                    : '';
+                const icon =
+                    notif.type === 'success'
+                        ? '✅'
+                        : notif.type === 'warning'
+                        ? '⚠️'
+                        : notif.type === 'error'
+                        ? '❌'
+                        : 'ℹ️';
 
-        container.innerHTML = `<h1 class="text-2xl lg:text-3xl font-bold mb-6 text-gray-800">Notifikasi</h1>
-            <div class="bg-white rounded-lg shadow-lg max-w-2xl mx-auto overflow-hidden">${listHTML}</div>`;
+                // delay animasi bertahap agar muncul satu-satu
+                const delay = index * 100;
+
+                return `
+                <div class="notif-item flex items-start gap-3 p-4 border-b ${bgClass} hover:bg-gray-50 transition-all duration-200"
+                     style="animation-delay:${delay}ms">
+                    <div class="text-xl">${icon}</div>
+                    <div class="flex-1">
+                        <p class="text-gray-800 text-sm font-medium flex items-center">
+                            ${notif.message} ${badge}
+                        </p>
+                        <p class="text-xs text-gray-500 mt-1">${notif.time}</p>
+                    </div>
+                </div>`;
+            })
+            .join('');
     }
 
+    container.innerHTML = `
+        <style>
+            @keyframes slideFadeIn {
+                0% { opacity: 0; transform: translateY(10px); }
+                100% { opacity: 1; transform: translateY(0); }
+            }
+            .notif-item {
+                animation: slideFadeIn 0.4s ease forwards;
+            }
+        </style>
+        <div class="max-w-3xl mx-auto">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-3xl">🔔</span>
+                <h1 class="text-2xl lg:text-3xl font-bold text-gray-800">Notifikasi</h1>
+            </div>
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
+                ${listHTML}
+            </div>
+        </div>
+    `;
+}
     function renderFlowchartPage(role) {
         const containerId = `page-${role}-flowchart`;
         const container = document.getElementById(containerId);
@@ -2593,6 +3068,18 @@ ${diagramSyntax}
         document.getElementById('closeCalendarModal').addEventListener('click', function () {
             document.getElementById('calendarModal').classList.add('hidden');
         });
+    });
+    document.getElementById('support-file').addEventListener('change', function(event) {
+        const fileName = event.target.files.length > 0 ? event.target.files[0].name : 'Klik untuk memilih file';
+        document.getElementById('file-label').textContent = fileName;
+    });
+     document.getElementById('support-file-satu').addEventListener('change', function(e) {
+        document.getElementById('file-name-satu').textContent = e.target.files.length ? e.target.files[0].name : 'Klik untuk memilih file';
+    });
+
+    // Menampilkan nama file untuk Ruang Audio Visual
+    document.getElementById('support-file-dua').addEventListener('change', function(e) {
+        document.getElementById('file-name-dua').textContent = e.target.files.length ? e.target.files[0].name : 'Klik untuk memilih file';
     });
 </script>
 
