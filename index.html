@@ -215,6 +215,26 @@
         .animate-fadeIn {
         animation: fadeIn 0.3s ease-out;
         }
+
+        /* Menyesuaikan ukuran font dan padding di dalam sel hari */
+.custom-day-cell .fc-daygrid-day-number {
+    font-size: 1.5rem; /* Ukuran font tanggal */
+    padding: 10px; /* Padding di sekitar tanggal */
+}
+
+/* Memperbesar tinggi setiap sel hari */
+.custom-day-cell {
+    height: 50px; /* Tinggi sel hari */
+}
+#calendarModal .max-w-lg {
+  /* Ubah ukuran lebar maksimum modal */
+  max-width: 700px; /* Contoh: Ganti 700px dengan ukuran yang Anda inginkan */
+}
+
+#calendarModal .bg-white {
+  /* Atur padding di dalam modal agar lebih lega */
+  padding: 3rem; /* Contoh: Meningkatkan padding dari p-6 menjadi p-8 */
+}
         
     </style>
 </head>
@@ -425,7 +445,45 @@
                     <a href="#all-bookings" class="admin-sidebar-item flex items-center px-4 py-3 hover:bg-gray-700 rounded-lg transition-colors duration-200 cursor-pointer"><span class="h-6 w-6 mr-3 hero-icon" data-icon="clipboard-document-list"></span>Manajemen Pesanan</a>
                     <a href="#manage-rooms" class="admin-sidebar-item flex items-center px-4 py-3 hover:bg-gray-700 rounded-lg transition-colors duration-200 cursor-pointer"><span class="h-6 w-6 mr-3 hero-icon" data-icon="building-office-2"></span>Manajemen Ruangan</a>
                     <a href="#feedback" class="admin-sidebar-item flex items-center px-4 py-3 hover:bg-gray-700 rounded-lg transition-colors duration-200 cursor-pointer"><span class="h-6 w-6 mr-3 hero-icon" data-icon="chat-bubble-left-ellipsis"></span>Feedback Pengguna</a>
-                    <a href="#audit-trail" class="admin-sidebar-item flex items-center px-4 py-3 hover:bg-gray-700 rounded-lg transition-colors duration-200 cursor-pointer"><span class="h-6 w-6 mr-3 hero-icon" data-icon="shield-check"></span>Audit Trail</a>
+                    <a href="#flowchart" class="admin-sidebar-item flex items-center px-4 py-3 hover:bg-gray-700 rounded-lg transition-colors duration-200 cursor-pointer"><span class="h-6 w-6 mr-3 hero-icon" data-icon="information-circle"></span>Proses Bisnis</a>
+                </nav>
+                <footer class="p-4 border-t border-gray-700">
+                    <a href="https://wa.me/6281510599991" target="_blank" class="flex items-center justify-center w-full text-sm text-gray-300 hover:text-white mb-4 transition-colors duration-200">
+                        <span class="h-5 w-5 mr-2 hero-icon" data-icon="chat-bubble-left-ellipsis"></span>
+                        Dukungan WhatsApp
+                    </a>
+                    <button id="logout-btn-admin" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200">Logout</button>
+                </footer>
+            </aside>
+            <div id="admin-main-content" class="flex-1 flex flex-col">
+                <header class="bg-white shadow-sm p-4 flex items-center md:hidden relative">
+                     <button id="admin-menu-btn" class="text-gray-600 hover:text-gray-900 z-10">
+                        <span class="h-6 w-6 block hero-icon" data-icon="bars-3"></span>
+                    </button>
+                    <h1 class="text-lg font-semibold text-gray-800 absolute inset-0 flex items-center justify-center">Admin Panel</h1>
+                </header>
+                <main class="flex-1 p-4 sm:p-6 lg:p-8 overflow-auto">
+                    <div id="page-admin-dashboard" class="page"></div>
+                    <div id="page-admin-reports" class="page"></div>
+                    <div id="page-admin-schedule" class="page"></div>
+                    <div id="page-admin-manage-rooms" class="page"></div>
+                    <div id="page-admin-all-bookings" class="page"></div>
+                    <div id="page-admin-feedback" class="page"></div>
+                    <div id="page-admin-flowchart" class="page"></div>
+                </main>
+            </div>
+        </div>
+        <!-- === TAMPILAN SUPERADMIN (SUPERADMIN VIEW) === -->
+        <div id="superadmin-view" class="view h-full w-full">
+             <aside id="superadmin-sidebar" class="bg-gray-800 text-white w-64 flex-col flex-shrink-0 absolute md:relative inset-y-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out z-30 flex">
+                <header class="p-6 font-bold text-xl border-b border-gray-700 text-center">SuperAdmin Panel</header>
+                <nav class="flex-1 mt-6 admin-nav space-y-2 px-2">
+                    <a href="#dashboard" class="admin-sidebar-item flex items-center px-4 py-3 hover:bg-gray-700 rounded-lg transition-colors duration-200 cursor-pointer"><span class="h-6 w-6 mr-3 hero-icon" data-icon="chart-pie"></span>Dashboard</a>
+                    <a href="#reports" class="admin-sidebar-item flex items-center px-4 py-3 hover:bg-gray-700 rounded-lg transition-colors duration-200 cursor-pointer"><span class="h-6 w-6 mr-3 hero-icon" data-icon="chart-bar-square"></span>Laporan Pesanan</a>
+                    <a href="#schedule" class="admin-sidebar-item flex items-center px-4 py-3 hover:bg-gray-700 rounded-lg transition-colors duration-200 cursor-pointer"><span class="h-6 w-6 mr-3 hero-icon" data-icon="calendar-days"></span>Jadwal Ruangan</a>
+                    <a href="#all-bookings" class="admin-sidebar-item flex items-center px-4 py-3 hover:bg-gray-700 rounded-lg transition-colors duration-200 cursor-pointer"><span class="h-6 w-6 mr-3 hero-icon" data-icon="clipboard-document-list"></span>Manajemen Pesanan</a>
+                    <a href="#manage-rooms" class="admin-sidebar-item flex items-center px-4 py-3 hover:bg-gray-700 rounded-lg transition-colors duration-200 cursor-pointer"><span class="h-6 w-6 mr-3 hero-icon" data-icon="building-office-2"></span>Manajemen Ruangan</a>
+                    <a href="#feedback" class="admin-sidebar-item flex items-center px-4 py-3 hover:bg-gray-700 rounded-lg transition-colors duration-200 cursor-pointer"><span class="h-6 w-6 mr-3 hero-icon" data-icon="chat-bubble-left-ellipsis"></span>Feedback Pengguna</a>
                     <a href="#flowchart" class="admin-sidebar-item flex items-center px-4 py-3 hover:bg-gray-700 rounded-lg transition-colors duration-200 cursor-pointer"><span class="h-6 w-6 mr-3 hero-icon" data-icon="information-circle"></span>Proses Bisnis</a>
                 </nav>
                 <footer class="p-4 border-t border-gray-700">
@@ -798,9 +856,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (role === 'user') {
             currentUser = { id: 'user01', name: 'Budi Santoso', role: 'user' };
             userView.classList.add('active');
-        } else {
+        } else if (role === 'admin') {
             currentUser = { id: 'admin01', name: 'Admin Utama', role: 'admin' };
             adminView.classList.add('active');
+        } else if (role === 'superadmin') {
+            currentUser = { id: 'superadmin01', name: 'Super Admin', role: 'superadmin' };
+            adminView.classList.add('active'); // Ganti dengan nama tampilan super admin yang Anda miliki
+        } else {
+            console.error('Invalid role specified');
+            return;
         }
         loginScreen.classList.remove('active');
         document.getElementById('app-container').style.display = 'flex';
@@ -822,6 +886,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const targetPage = document.querySelector(`#page-${view}-${hash}`);
         if (targetPage) {
             targetPage.classList.add('active');
+
+            // Menjalankan mermaid.js jika halaman yang ditargetkan adalah flowchart
             if (hash === 'flowchart') {
                 setTimeout(() => {
                     mermaid.run({
@@ -830,15 +896,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, 10);
             }
         }
-        
         document.querySelectorAll(`#${view}-view .sidebar-item, #${view}-view .admin-sidebar-item`).forEach(i => i.classList.remove('active'));
         const targetLink = document.querySelector(`#${view}-view a[href="#${hash}"]`);
         if (targetLink) targetLink.classList.add('active');
-        
+
         if (window.innerWidth < 768) {
-             if (view === 'user') userSidebar.classList.add('-translate-x-full');
-             if (view === 'admin') adminSidebar.classList.add('-translate-x-full');
-             sidebarOverlay.classList.add('hidden');
+            if (view === 'user') {
+                userSidebar.classList.add('-translate-x-full');
+            } else if (view === 'admin' || view === 'superadmin') {
+                adminSidebar.classList.add('-translate-x-full');
+            }
+            sidebarOverlay.classList.add('hidden');
         }
     }
     
@@ -889,7 +957,6 @@ document.addEventListener('DOMContentLoaded', () => {
         initIcons();
     }
 
-
     /** Renders all content based on the current user's role. */
     function renderAll() {
         if (!currentUser) return;
@@ -899,7 +966,7 @@ document.addEventListener('DOMContentLoaded', () => {
             renderUserNotifikasiPage();
             renderFlowchartPage('user');
             navigate('user', 'daftar');
-        } else if (currentUser.role === 'admin') {
+        } else if (currentUser.role === 'admin' || currentUser.role === 'superadmin') {
             renderAdminDashboard();
             renderAdminReportsPage();
             renderAdminSchedulePage(TODAY_DATE.toISOString().split('T')[0], scheduleRoomFilter);
@@ -908,7 +975,9 @@ document.addEventListener('DOMContentLoaded', () => {
             renderAdminFeedbackPage();
             renderFlowchartPage('admin');
             navigate('admin', 'dashboard');
+             updateAdminView();
         }
+
         initIcons();
     }
     
@@ -924,11 +993,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- User View Rendering ---
     
     // Tambahkan daftar tanggal yang diblokir secara manual (format: YYYY-MM-DD)
-const blockedDates = [
-    "2025-08-05",
-    "2025-08-14",
-    "2025-08-21"
-];
+    const blockedDates = [
+        "2025-08-05",
+        "2025-08-14",
+        "2025-08-21"
+    ];
 
     function renderCalendarInModal(roomId = null) {
         const modal = document.getElementById('calendar-modal');
@@ -1084,8 +1153,6 @@ const blockedDates = [
         selectedRooms = [];
         currentCalendarRoomId = null;
     }
-
-
 
     function showCalendarModal(roomId = null) {
         currentCalendarRoomId = roomId; // Store the room ID
@@ -1336,241 +1403,239 @@ const blockedDates = [
         `;
     }
 
-  function renderUserRiwayatPage() {
-    const container = document.getElementById('page-user-riwayat');
-    if (!container) return;
+    function renderUserRiwayatPage() {
+        const container = document.getElementById('page-user-riwayat');
+        if (!container) return;
 
-    const myBookings = bookingsData
-        .filter(b => b.userId === currentUser.id)
-        .sort((a, b) => new Date(b.date) - new Date(a.date));
+        const myBookings = bookingsData
+            .filter(b => b.userId === currentUser.id)
+            .sort((a, b) => new Date(b.date) - new Date(a.date));
 
-    let listHTML = '';
-    if (myBookings.length === 0) {
-        listHTML = renderEmptyState('Belum Ada Riwayat', 'Anda belum pernah membuat pesanan.', 'document-duplicate');
-    } else {
-        listHTML = myBookings.map(booking => {
-            const room = roomsData.find(r => r.id === booking.roomId);
-            const status = getBookingStatus(booking);
-            const hasFeedback = feedbackData.some(f => f.bookingId === booking.id);
+        let listHTML = '';
+        if (myBookings.length === 0) {
+            listHTML = renderEmptyState('Belum Ada Riwayat', 'Anda belum pernah membuat pesanan.', 'document-duplicate');
+        } else {
+            listHTML = myBookings.map(booking => {
+                const room = roomsData.find(r => r.id === booking.roomId);
+                const status = getBookingStatus(booking);
+                const hasFeedback = feedbackData.some(f => f.bookingId === booking.id);
 
-            let feedbackButton = '';
-            if (status.text === 'Selesai' && !hasFeedback) {
-                feedbackButton = `<button data-booking-id="${booking.id}" class="open-feedback-modal-btn mt-2 sm:mt-0 sm:ml-4 text-sm bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold py-1 px-3 rounded-md hover:from-blue-600 hover:to-blue-700 transition-colors shadow-sm">⭐ Beri Penilaian</button>`;
-            }
+                let feedbackButton = '';
+                if (status.text === 'Selesai' && !hasFeedback) {
+                    feedbackButton = `<button data-booking-id="${booking.id}" class="open-feedback-modal-btn mt-2 sm:mt-0 sm:ml-4 text-sm bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold py-1 px-3 rounded-md hover:from-blue-600 hover:to-blue-700 transition-colors shadow-sm">⭐ Beri Penilaian</button>`;
+                }
 
-            let uploadButton = '';
-            if (status.text === 'Sudah Dijadwalkan' || status.text === 'Selesai') {
-                uploadButton = `
-                    <label class="ml-4 cursor-pointer bg-green-100 text-green-700 font-semibold py-1 px-3 rounded-md hover:bg-green-200 transition-colors text-sm">
-                        Upload File
-                        <input type="file" data-booking-id="${booking.id}" class="hidden booking-file-input" accept=".pdf,.doc,.docx,.jpg,.png">
-                    </label>
-                `;
-            }
-
-            return `
-                <div class="bg-white p-4 rounded-lg shadow-md mb-4 flex flex-col sm:flex-row sm:justify-between sm:items-center">
-                    <div class="flex-grow mb-4 sm:mb-0">
-                        <p class="font-bold text-gray-800">${room.name}</p>
-                        <p class="text-sm text-gray-600">${booking.activity}</p>
-                        <p class="text-sm text-gray-500 mt-1">
-                            ${new Date(booking.date).toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'})} | ${booking.start} - ${booking.end}
-                        </p>
-                    </div>
-                    <div class="flex-shrink-0 flex items-center">
-                        <span class="px-3 py-1 text-xs font-semibold rounded-full ${status.class}">${status.text}</span>
-                        ${feedbackButton}
-                        ${uploadButton}
-                    </div>
-                </div>
-            `;
-        }).join('');
-    }
-
-    container.innerHTML = `
-        <h1 class="text-2xl lg:text-3xl font-bold mb-6 text-gray-800">Riwayat Pesanan Saya</h1>
-        <div>${listHTML}</div>
-
-        <!-- Modal Penilaian -->
-        <div id="feedback-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-            <div class="bg-white p-6 rounded-xl shadow-lg w-full max-w-md transform scale-95 opacity-0 transition-all duration-300" id="feedback-modal-content">
-                <h2 class="text-xl font-bold mb-4 text-gray-800">Beri Penilaian</h2>
-
-                <!-- Rating Bintang -->
-                <div id="feedback-stars" class="flex gap-2 text-3xl mb-4">
-                    ${[1,2,3,4,5].map(star => `<span data-star="${star}" class="cursor-pointer text-gray-300 hover:text-yellow-400 transition-colors">★</span>`).join('')}
-                </div>
-
-                <!-- Komentar -->
-                <textarea id="feedback-comment" rows="4" class="w-full border border-gray-300 rounded-lg p-3 mb-4 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Tulis komentar Anda..."></textarea>
-
-                <!-- Tombol -->
-                <div class="flex justify-end gap-2">
-                    <button id="feedback-cancel" class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition-colors">Batal</button>
-                    <button id="feedback-submit" class="px-4 py-2 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 shadow-md">Kirim</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Notifikasi Penilaian -->
-       <div id="feedback-notification" 
-            class="fixed bottom-8 right-8 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50"
-            style="display:none;">
-            Terima kasih atas penilaian Anda!
-        </div>
-
-    `;
-
-    // Event Upload File
-    document.querySelectorAll('.booking-file-input').forEach(input => {
-        input.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                document.getElementById('upload-file-name').textContent = `File "${file.name}" berhasil diunggah.`;
-                document.getElementById('upload-success-modal').classList.remove('hidden');
-            }
-        });
-    });
-
-    document.getElementById('upload-modal-close')?.addEventListener('click', () => {
-        document.getElementById('upload-success-modal').classList.add('hidden');
-    });
-
-    // Event Modal Penilaian
-    let selectedBookingId = null;
-    let selectedRating = 0;
-
-    document.querySelectorAll('.open-feedback-modal-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            selectedBookingId = btn.getAttribute('data-booking-id');
-            selectedRating = 0;
-            document.querySelectorAll('#feedback-stars span').forEach(s => s.classList.remove('text-yellow-400'));
-            document.getElementById('feedback-comment').value = '';
-            document.getElementById('feedback-modal').classList.remove('hidden');
-
-            // Efek animasi pop up
-            const modalContent = document.getElementById('feedback-modal-content');
-            setTimeout(() => {
-                modalContent.classList.remove('scale-95', 'opacity-0');
-                modalContent.classList.add('scale-100', 'opacity-100');
-            }, 10);
-        });
-    });
-
-    document.getElementById('feedback-cancel').addEventListener('click', () => {
-        document.getElementById('feedback-modal').classList.add('hidden');
-    });
-
-    // Pilih Rating
-    document.querySelectorAll('#feedback-stars span').forEach(starEl => {
-        starEl.addEventListener('click', () => {
-            selectedRating = parseInt(starEl.getAttribute('data-star'));
-            document.querySelectorAll('#feedback-stars span').forEach(s => {
-                s.classList.toggle('text-yellow-400', parseInt(s.getAttribute('data-star')) <= selectedRating);
-                s.classList.toggle('text-gray-300', parseInt(s.getAttribute('data-star')) > selectedRating);
-            });
-        });
-    });
-
-    // Submit Feedback
-    document.getElementById('feedback-submit').addEventListener('click', () => {
-    const comment = document.getElementById('feedback-comment').value.trim();
-    if (selectedRating === 0) {
-        alert('Pilih rating terlebih dahulu.');
-        return;
-    }
-    feedbackData.push({
-        bookingId: selectedBookingId,
-        rating: selectedRating,
-        comment: comment,
-        date: new Date().toISOString()
-    });
-    document.getElementById('feedback-modal').classList.add('hidden');
-
-    // Tampilkan notifikasi secara sederhana
-    const notif = document.getElementById('feedback-notification');
-    notif.style.display = 'block';  // tampilkan notif
-
-    setTimeout(() => {
-        notif.style.display = 'none';  // sembunyikan notif setelah 3 detik
-    }, 3000);
-
-    renderUserRiwayatPage();
-});
-
-}
-
-function renderUserNotifikasiPage() {
-    const container = document.getElementById('page-user-notifikasi');
-    if (!container) return;
-
-    const myNotifications = notificationsData
-        .filter(n => n.userId === currentUser.id || n.userId === 'all')
-        .sort((a, b) => new Date(b.rawTime) - new Date(a.rawTime));
-
-    let listHTML;
-
-    if (myNotifications.length === 0) {
-        listHTML = renderEmptyState(
-            'Tidak Ada Notifikasi',
-            'Kotak masuk Anda kosong.',
-            'inbox-arrow-down'
-        );
-    } else {
-        listHTML = myNotifications
-            .map((notif, index) => {
-                const bgClass = notif.read ? 'bg-white' : 'bg-blue-50';
-                const badge = !notif.read
-                    ? `<span class="ml-2 px-2 py-0.5 text-xs bg-red-500 text-white rounded-full animate-pulse">Baru</span>`
-                    : '';
-                const icon =
-                    notif.type === 'success'
-                        ? '✅'
-                        : notif.type === 'warning'
-                        ? '⚠️'
-                        : notif.type === 'error'
-                        ? '❌'
-                        : 'ℹ️';
-
-                // delay animasi bertahap agar muncul satu-satu
-                const delay = index * 100;
+                let uploadButton = '';
+                if (status.text === 'Sudah Dijadwalkan' || status.text === 'Selesai') {
+                    uploadButton = `
+                        <label class="ml-4 cursor-pointer bg-green-100 text-green-700 font-semibold py-1 px-3 rounded-md hover:bg-green-200 transition-colors text-sm">
+                            Upload File
+                            <input type="file" data-booking-id="${booking.id}" class="hidden booking-file-input" accept=".pdf,.doc,.docx,.jpg,.png">
+                        </label>
+                    `;
+                }
 
                 return `
-                <div class="notif-item flex items-start gap-3 p-4 border-b ${bgClass} hover:bg-gray-50 transition-all duration-200"
-                     style="animation-delay:${delay}ms">
-                    <div class="text-xl">${icon}</div>
-                    <div class="flex-1">
-                        <p class="text-gray-800 text-sm font-medium flex items-center">
-                            ${notif.message} ${badge}
-                        </p>
-                        <p class="text-xs text-gray-500 mt-1">${notif.time}</p>
+                    <div class="bg-white p-4 rounded-lg shadow-md mb-4 flex flex-col sm:flex-row sm:justify-between sm:items-center">
+                        <div class="flex-grow mb-4 sm:mb-0">
+                            <p class="font-bold text-gray-800">${room.name}</p>
+                            <p class="text-sm text-gray-600">${booking.activity}</p>
+                            <p class="text-sm text-gray-500 mt-1">
+                                ${new Date(booking.date).toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'})} | ${booking.start} - ${booking.end}
+                            </p>
+                        </div>
+                        <div class="flex-shrink-0 flex items-center">
+                            <span class="px-3 py-1 text-xs font-semibold rounded-full ${status.class}">${status.text}</span>
+                            ${feedbackButton}
+                            ${uploadButton}
+                        </div>
                     </div>
-                </div>`;
-            })
-            .join('');
+                `;
+            }).join('');
+        }
+
+        container.innerHTML = `
+            <h1 class="text-2xl lg:text-3xl font-bold mb-6 text-gray-800">Riwayat Pesanan Saya</h1>
+            <div>${listHTML}</div>
+
+            <!-- Modal Penilaian -->
+            <div id="feedback-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+                <div class="bg-white p-6 rounded-xl shadow-lg w-full max-w-md transform scale-95 opacity-0 transition-all duration-300" id="feedback-modal-content">
+                    <h2 class="text-xl font-bold mb-4 text-gray-800">Beri Penilaian</h2>
+
+                    <!-- Rating Bintang -->
+                    <div id="feedback-stars" class="flex gap-2 text-3xl mb-4">
+                        ${[1,2,3,4,5].map(star => `<span data-star="${star}" class="cursor-pointer text-gray-300 hover:text-yellow-400 transition-colors">★</span>`).join('')}
+                    </div>
+
+                    <!-- Komentar -->
+                    <textarea id="feedback-comment" rows="4" class="w-full border border-gray-300 rounded-lg p-3 mb-4 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Tulis komentar Anda..."></textarea>
+
+                    <!-- Tombol -->
+                    <div class="flex justify-end gap-2">
+                        <button id="feedback-cancel" class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition-colors">Batal</button>
+                        <button id="feedback-submit" class="px-4 py-2 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 shadow-md">Kirim</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notifikasi Penilaian -->
+        <div id="feedback-notification" 
+                class="fixed bottom-8 right-8 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50"
+                style="display:none;">
+                Terima kasih atas penilaian Anda!
+            </div>
+
+        `;
+
+        // Event Upload File
+        document.querySelectorAll('.booking-file-input').forEach(input => {
+            input.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    document.getElementById('upload-file-name').textContent = `File "${file.name}" berhasil diunggah.`;
+                    document.getElementById('upload-success-modal').classList.remove('hidden');
+                }
+            });
+        });
+
+        document.getElementById('upload-modal-close')?.addEventListener('click', () => {
+            document.getElementById('upload-success-modal').classList.add('hidden');
+        });
+
+        // Event Modal Penilaian
+        let selectedBookingId = null;
+        let selectedRating = 0;
+
+        document.querySelectorAll('.open-feedback-modal-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                selectedBookingId = btn.getAttribute('data-booking-id');
+                selectedRating = 0;
+                document.querySelectorAll('#feedback-stars span').forEach(s => s.classList.remove('text-yellow-400'));
+                document.getElementById('feedback-comment').value = '';
+                document.getElementById('feedback-modal').classList.remove('hidden');
+
+                // Efek animasi pop up
+                const modalContent = document.getElementById('feedback-modal-content');
+                setTimeout(() => {
+                    modalContent.classList.remove('scale-95', 'opacity-0');
+                    modalContent.classList.add('scale-100', 'opacity-100');
+                }, 10);
+            });
+        });
+
+        document.getElementById('feedback-cancel').addEventListener('click', () => {
+            document.getElementById('feedback-modal').classList.add('hidden');
+        });
+
+        // Pilih Rating
+        document.querySelectorAll('#feedback-stars span').forEach(starEl => {
+            starEl.addEventListener('click', () => {
+                selectedRating = parseInt(starEl.getAttribute('data-star'));
+                document.querySelectorAll('#feedback-stars span').forEach(s => {
+                    s.classList.toggle('text-yellow-400', parseInt(s.getAttribute('data-star')) <= selectedRating);
+                    s.classList.toggle('text-gray-300', parseInt(s.getAttribute('data-star')) > selectedRating);
+                });
+            });
+        });
+
+        // Submit Feedback
+        document.getElementById('feedback-submit').addEventListener('click', () => {
+        const comment = document.getElementById('feedback-comment').value.trim();
+        if (selectedRating === 0) {
+            alert('Pilih rating terlebih dahulu.');
+            return;
+        }
+        feedbackData.push({
+            bookingId: selectedBookingId,
+            rating: selectedRating,
+            comment: comment,
+            date: new Date().toISOString()
+        });
+        document.getElementById('feedback-modal').classList.add('hidden');
+            const notif = document.getElementById('feedback-notification');
+            notif.style.display = 'block';  // tampilkan notif
+
+            setTimeout(() => {
+                notif.style.display = 'none'; 
+            }, 3000);
+
+            renderUserRiwayatPage();
+        });
+
     }
 
-    container.innerHTML = `
-        <style>
-            @keyframes slideFadeIn {
-                0% { opacity: 0; transform: translateY(10px); }
-                100% { opacity: 1; transform: translateY(0); }
-            }
-            .notif-item {
-                animation: slideFadeIn 0.4s ease forwards;
-            }
-        </style>
-        <div class="max-w-3xl mx-auto">
-            <div class="flex items-center gap-3 mb-6">
-                <span class="text-3xl">🔔</span>
-                <h1 class="text-2xl lg:text-3xl font-bold text-gray-800">Notifikasi</h1>
+    function renderUserNotifikasiPage() {
+        const container = document.getElementById('page-user-notifikasi');
+        if (!container) return;
+
+        const myNotifications = notificationsData
+            .filter(n => n.userId === currentUser.id || n.userId === 'all')
+            .sort((a, b) => new Date(b.rawTime) - new Date(a.rawTime));
+
+        let listHTML;
+
+        if (myNotifications.length === 0) {
+            listHTML = renderEmptyState(
+                'Tidak Ada Notifikasi',
+                'Kotak masuk Anda kosong.',
+                'inbox-arrow-down'
+            );
+        } else {
+            listHTML = myNotifications
+                .map((notif, index) => {
+                    const bgClass = notif.read ? 'bg-white' : 'bg-blue-50';
+                    const badge = !notif.read
+                        ? `<span class="ml-2 px-2 py-0.5 text-xs bg-red-500 text-white rounded-full animate-pulse">Baru</span>`
+                        : '';
+                    const icon =
+                        notif.type === 'success'
+                            ? '✅'
+                            : notif.type === 'warning'
+                            ? '⚠️'
+                            : notif.type === 'error'
+                            ? '❌'
+                            : 'ℹ️';
+
+                    // delay animasi bertahap agar muncul satu-satu
+                    const delay = index * 100;
+
+                    return `
+                    <div class="notif-item flex items-start gap-3 p-4 border-b ${bgClass} hover:bg-gray-50 transition-all duration-200"
+                        style="animation-delay:${delay}ms">
+                        <div class="text-xl">${icon}</div>
+                        <div class="flex-1">
+                            <p class="text-gray-800 text-sm font-medium flex items-center">
+                                ${notif.message} ${badge}
+                            </p>
+                            <p class="text-xs text-gray-500 mt-1">${notif.time}</p>
+                        </div>
+                    </div>`;
+                })
+                .join('');
+        }
+
+        container.innerHTML = `
+            <style>
+                @keyframes slideFadeIn {
+                    0% { opacity: 0; transform: translateY(10px); }
+                    100% { opacity: 1; transform: translateY(0); }
+                }
+                .notif-item {
+                    animation: slideFadeIn 0.4s ease forwards;
+                }
+            </style>
+            <div class="max-w-3xl mx-auto">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="text-3xl">🔔</span>
+                    <h1 class="text-2xl lg:text-3xl font-bold text-gray-800">Notifikasi</h1>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
+                    ${listHTML}
+                </div>
             </div>
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
-                ${listHTML}
-            </div>
-        </div>
-    `;
-}
+        `;
+    }
     function renderFlowchartPage(role) {
         const containerId = `page-${role}-flowchart`;
         const container = document.getElementById(containerId);
@@ -1616,6 +1681,40 @@ ${diagramSyntax}
     
     // --- Admin View Rendering ---
     
+    function updateAdminView() {
+        if (currentUser.role === 'superadmin') {
+            // Ganti judul sidebar
+            const sidebarHeader = document.querySelector('#admin-sidebar header');
+            if (sidebarHeader) {
+                sidebarHeader.textContent = 'Superadmin Panel';
+            }
+
+            const logoutButton = document.getElementById('logout-btn-admin');
+            if (logoutButton) {
+                logoutButton.id = 'logout-btn-superadmin';
+            }
+
+            const mobileHeader = document.querySelector('#admin-main-content header h1');
+            if (mobileHeader) {
+                mobileHeader.textContent = 'Superadmin Panel';
+            }
+        } else {
+            const sidebarHeader = document.querySelector('#admin-sidebar header');
+            if (sidebarHeader) {
+                sidebarHeader.textContent = 'Admin Panel';
+            }
+            
+            const logoutButton = document.getElementById('logout-btn-superadmin');
+            if (logoutButton) {
+                logoutButton.id = 'logout-btn-admin';
+            }
+            
+            const mobileHeader = document.querySelector('#admin-main-content header h1');
+            if (mobileHeader) {
+                mobileHeader.textContent = 'Admin Panel';
+            }
+        }
+    }
     function renderAdminDashboard() {
         const container = document.getElementById('page-admin-dashboard');
         if (!container) return;
@@ -1770,7 +1869,6 @@ ${diagramSyntax}
         });
     }
 
-
     function renderAdminReportsPage() {
         const container = document.getElementById('page-admin-reports');
         if (!container) return;
@@ -1872,48 +1970,56 @@ ${diagramSyntax}
     function renderAdminManageRooms() {
         const container = document.getElementById('page-admin-manage-rooms');
         if (!container) return;
+        const isSuperAdmin = currentUser && currentUser.role === 'superadmin';
 
-        let tableRowsHTML = roomsData.map(room => `
-            <tr class="border-b hover:bg-gray-50 ${room.hidden ? 'opacity-50' : ''}">
-                <td class="p-3 py-4 font-medium text-gray-800">${room.name}</td>
-                <td class="p-3 py-4 text-gray-600">${room.type}</td>
-                <td class="p-3 py-4 text-gray-600">${room.capacity}</td>
-                <td class="p-3 py-4 text-gray-600">${room.dinas || '-'}</td>
-                <td class="p-3 py-4 text-sm text-gray-500">${room.facilities}</td>
-                <td class="p-3 py-4">
-                    <!-- Toggle Switch -->
-                    <label class="inline-flex items-center cursor-pointer">
-                        <input type="checkbox" class="room-visibility-toggle hidden" data-room-id="${room.id}" ${room.hidden ? '' : 'checked'}>
-                        <span class="relative w-12 h-6 bg-gray-300 rounded-full transition duration-300 ease-in-out ${room.hidden ? '' : 'bg-green-500'}">
-                            <span class="absolute left-1 top-1 bg-white w-4 h-4 rounded-full shadow transform transition duration-300 ease-in-out ${room.hidden ? '' : 'translate-x-6'}"></span>
+        let tableRowsHTML = roomsData.map(room => {
+            const hideCrudButtons = isSuperAdmin;
+            
+            return `
+                <tr class="border-b hover:bg-gray-50 ${room.hidden ? 'opacity-50' : ''}">
+                    <td class="p-3 py-4 font-medium text-gray-800">${room.name}</td>
+                    <td class="p-3 py-4 text-gray-600">${room.type}</td>
+                    <td class="p-3 py-4 text-gray-600">${room.capacity}</td>
+                    <td class="p-3 py-4 text-gray-600">${room.dinas || '-'}</td>
+                    <td class="p-3 py-4 text-sm text-gray-500">${room.facilities}</td>
+                    ${!isSuperAdmin ? `<td class="p-3 py-4">
+                        <label class="inline-flex items-center ${hideCrudButtons ? '' : 'cursor-pointer'}">
+                            <input type="checkbox" class="room-visibility-toggle hidden" data-room-id="${room.id}" ${room.hidden ? '' : 'checked'} ${hideCrudButtons ? 'disabled' : ''}>
+                            <span class="relative w-12 h-6 bg-gray-300 rounded-full transition duration-300 ease-in-out ${room.hidden ? '' : 'bg-green-500'}">
+                                <span class="absolute left-1 top-1 bg-white w-4 h-4 rounded-full shadow transform transition duration-300 ease-in-out ${room.hidden ? '' : 'translate-x-6'}"></span>
+                            </span>
+                        </label>
+                    </td>` : ''}
+                    <td class="p-3 py-4 text-left">
+                        <span data-room-id="${room.id}" class="block-calendar-btn ${hideCrudButtons ? 'hidden' : 'cursor-pointer'} inline-block bg-purple-600 text-white px-2 py-1 rounded hover:bg-purple-700 transition-colors text-xs">
+                        <i class="hero-icon" data-icon="calendar-x-mark">📅Blokir Tanggal</i>
                         </span>
-                    </label>
-                </td>
-                <td class="p-3 py-4 text-left">
-                    <span data-room-id="${room.id}" class="block-calendar-btn cursor-pointer inline-block bg-purple-600 text-white px-2 py-1 rounded hover:bg-purple-700 transition-colors text-xs">
-                       <i class="hero-icon" data-icon="calendar-x-mark">📅Blokir Tanggal</i>
-                    </span>
-                </td>
-                <td class="p-3 py-4 text-right">
-                    <div class="flex items-center justify-end space-x-2">
-                        <button data-room-id="${room.id}" class="edit-room-btn bg-yellow-500 text-white p-1.5 rounded-md hover:bg-yellow-600 transition-colors">
-                            <span class="h-4 w-4 block hero-icon" data-icon="pencil"></span>
-                        </button>
-                        <button data-room-id="${room.id}" class="delete-room-btn bg-red-600 text-white p-1.5 rounded-md hover:bg-red-700 transition-colors">
-                            <span class="h-4 w-4 block hero-icon" data-icon="trash"></span>
-                        </button>
-                        <!-- Tombol Blokir Kalender -->
-                    </div>
-                </td>
-            </tr>
-        `).join('');
+                    </td>
+                    <td class="p-3 py-4 text-right">
+                        <div class="flex items-center justify-end space-x-2">
+                            ${hideCrudButtons ? '' : `
+                            <button data-room-id="${room.id}" class="edit-room-btn bg-yellow-500 text-white p-1.5 rounded-md hover:bg-yellow-600 transition-colors">
+                                <span class="h-4 w-4 block hero-icon" data-icon="pencil"></span>
+                            </button>
+                            <button data-room-id="${room.id}" class="delete-room-btn bg-red-600 text-white p-1.5 rounded-md hover:bg-red-700 transition-colors">
+                                <span class="h-4 w-4 block hero-icon" data-icon="trash"></span>
+                            </button>
+                            `}
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
 
+        const addButtonHTML = isSuperAdmin ? '' : `
+            <button class="add-room-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors shadow-md hover:shadow-lg">
+                Tambah Ruangan
+            </button>
+        `;
         container.innerHTML = `
             <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                 <h1 class="text-2xl lg:text-3xl font-bold text-gray-800">Manajemen Ruangan</h1>
-                <button class="add-room-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors shadow-md hover:shadow-lg">
-                    Tambah Ruangan
-                </button>
+                ${addButtonHTML}
             </header>
             <div class="bg-white rounded-lg shadow-lg overflow-x-auto">
                 <table class="w-full text-sm text-left">
@@ -1924,23 +2030,23 @@ ${diagramSyntax}
                             <th class="p-3">Kap.</th>
                             <th class="p-3">Dinas</th>
                             <th class="p-3">Fasilitas</th>
-                            <th class="p-3">Tampil</th>
-                            <th class="p-3">Blokir Tanggal</th>
-                            <th class="p-3 text-right">Aksi</th>
+                            ${!isSuperAdmin ? `<th class="p-3 text-center w-20">Tampil</th>` : ''}
+                            ${!isSuperAdmin ? `<th class="p-3 text-center w-10">Blokir Tanggal</th>` : ''}
+                            ${!isSuperAdmin ? `<th class="p-3 text-right">Aksi</th>` : ''}
                         </tr>
                     </thead>
                     <tbody>${tableRowsHTML}</tbody>
                 </table>
             </div>`;
-
-        // Tambahkan event listener untuk tombol blokir kalender
-        document.addEventListener('click', function (e) {
-            const icon = e.target.closest('.block-calendar-btn');
-            if (icon) {
-                const roomId = icon.dataset.roomId;
-                showAdminCalendarModal(roomId); // GANTI DENGAN INI
-            }
-        });
+        if (!isSuperAdmin) {
+            document.addEventListener('click', function (e) {
+                const icon = e.target.closest('.block-calendar-btn');
+                if (icon) {
+                    const roomId = icon.dataset.roomId;
+                    showAdminCalendarModal(roomId);
+                }
+            });
+        }
     }
    
     function showAdminCalendarModal(roomId = null) {
@@ -2052,7 +2158,8 @@ ${diagramSyntax}
     function renderAdminAllBookings() {
         const container = document.getElementById('page-admin-all-bookings');
         if (!container) return;
-        
+        const isSuperAdmin = currentUser && currentUser.role === 'superadmin';
+
         const statusOrder = { "Sedang Ditinjau": 1, "Sudah Dijadwalkan": 2, "Tidak Tersedia": 3, "Selesai": 4 };
         const allBookings = [...bookingsData].sort((a, b) => statusOrder[getBookingStatus(a).text] - statusOrder[getBookingStatus(b).text] || new Date(b.date) - new Date(a.date));
         
@@ -2061,15 +2168,16 @@ ${diagramSyntax}
             const user = usersData.find(u => u.id === booking.userId);
             const status = getBookingStatus(booking);
             let actionButtons = '';
-
-            if (status.text === 'Sedang Ditinjau') {
-                actionButtons = `
-                    <button data-booking-id="${booking.id}" class="approve-booking-btn bg-green-500 text-white p-1.5 rounded-md hover:bg-green-600 transition-colors flex items-center justify-center" title="Setujui"><span class="h-4 w-4 hero-icon" data-icon="check"></span></button>
-                    <button data-booking-id="${booking.id}" class="reject-booking-btn bg-red-500 text-white p-1.5 rounded-md hover:bg-red-600 transition-colors flex items-center justify-center" title="Tolak"><span class="h-4 w-4 hero-icon" data-icon="x-mark"></span></button>
-                    <a href="#schedule" data-date="${booking.date}" class="view-schedule-btn bg-blue-500 text-white p-1.5 rounded-md hover:bg-blue-600 transition-colors flex items-center justify-center" title="Lihat Jadwal"><span class="h-4 w-4 hero-icon" data-icon="calendar-days"></span></a>
-                `;
-            } else if (status.text === 'Sudah Dijadwalkan') {
-                actionButtons = `<button data-booking-id="${booking.id}" class="cancel-booking-btn bg-gray-500 text-white p-1.5 rounded-md hover:bg-gray-600 transition-colors flex items-center justify-center" title="Batalkan"><span class="h-4 w-4 hero-icon" data-icon="trash"></span></button>`;
+            if (!isSuperAdmin) {
+                if (status.text === 'Sedang Ditinjau') {
+                    actionButtons = `
+                        <button data-booking-id="${booking.id}" class="approve-booking-btn bg-green-500 text-white p-1.5 rounded-md hover:bg-green-600 transition-colors flex items-center justify-center" title="Setujui"><span class="h-4 w-4 hero-icon" data-icon="check"></span></button>
+                        <button data-booking-id="${booking.id}" class="reject-booking-btn bg-red-500 text-white p-1.5 rounded-md hover:bg-red-600 transition-colors flex items-center justify-center" title="Tolak"><span class="h-4 w-4 hero-icon" data-icon="x-mark"></span></button>
+                        <a href="#schedule" data-date="${booking.date}" class="view-schedule-btn bg-blue-500 text-white p-1.5 rounded-md hover:bg-blue-600 transition-colors flex items-center justify-center" title="Lihat Jadwal"><span class="h-4 w-4 hero-icon" data-icon="calendar-days"></span></a>
+                    `;
+                } else if (status.text === 'Sudah Dijadwalkan') {
+                    actionButtons = `<button data-booking-id="${booking.id}" class="cancel-booking-btn bg-gray-500 text-white p-1.5 rounded-md hover:bg-gray-600 transition-colors flex items-center justify-center" title="Batalkan"><span class="h-4 w-4 hero-icon" data-icon="trash"></span></button>`;
+                }
             }
             
             return `
@@ -2093,7 +2201,7 @@ ${diagramSyntax}
                             <th class="p-3">Dipesan Oleh</th>
                             <th class="p-3">Tanggal</th>
                             <th class="p-3">Status</th>
-                            <th class="p-3 text-right">Aksi</th>
+                            ${!isSuperAdmin ? `<th class="p-3 text-right">Aksi</th>` : ''}
                         </tr>
                     </thead>
                     <tbody>${tableRowsHTML}</tbody>
@@ -2506,19 +2614,30 @@ ${diagramSyntax}
 
                     <!-- Tambahan: Radio Button Jumlah Booking -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Berapa kali bisa dibooking?</label>
-                        <div class="flex items-center space-x-6">
-                            <label class="flex items-center space-x-2">
-                                <input type="radio" name="room-booking-limit" value="1" ${room.bookingLimit === 1 ? 'checked' : ''}>
-                                <span>1 kali</span>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Atur waktu yang bisa dibooking?</label>
+                        <div class="flex flex-col space-y-4">
+                            <label class="flex items-start space-x-2">
+                                <input type="radio" name="room-booking-limit" value="1" ${room.bookingLimit === 1 ? 'checked' : ''} class="mt-1">
+                                <div class="flex-1">
+                                    <span class="font-medium text-gray-900">1x (08.00 - 12.00)</span>
+                                    <p class="text-sm text-gray-500">Pilih durasi ini untuk booking pada sesi pagi.</p>
+                                </div>
                             </label>
-                            <label class="flex items-center space-x-2">
-                                <input type="radio" name="room-booking-limit" value="2" ${room.bookingLimit === 2 ? 'checked' : ''}>
-                                <span>2 kali</span>
+
+                            <label class="flex items-start space-x-2">
+                                <input type="radio" name="room-booking-limit" value="2" ${room.bookingLimit === 2 ? 'checked' : ''} class="mt-1">
+                                <div class="flex-1">
+                                    <span class="font-medium text-gray-900">2x (08.00 - 12.00 dan 13.00 - 16.00)</span>
+                                    <p class="text-sm text-gray-500">Pilih durasi ini untuk booking pada sesi pagi dan siang.</p>
+                                </div>
                             </label>
-                            <label class="flex items-center space-x-2">
-                                <input type="radio" name="room-booking-limit" value="bebas" ${room.bookingLimit === 'bebas' ? 'checked' : ''}>
-                                <span>Bebas</span>
+
+                            <label class="flex items-start space-x-2">
+                                <input type="radio" name="room-booking-limit" value="bebas" ${room.bookingLimit === 'bebas' ? 'checked' : ''} class="mt-1">
+                                <div class="flex-1">
+                                    <span class="font-medium text-gray-900">Bebas (Full Day)</span>
+                                    <p class="text-sm text-gray-500">Pilih durasi ini untuk booking seharian penuh.</p>
+                                </div>
                             </label>
                         </div>
                     </div>
@@ -2759,15 +2878,16 @@ ${diagramSyntax}
             }
         }
         
+        if (e.target.matches('#role-superadmin')) {
+            document.getElementById('form-pilih-role').classList.add('hidden');
+            login('superadmin'); 
+        }
+
         if (e.target.matches('#role-admin')) {
             document.getElementById('form-pilih-role').classList.add('hidden');
             login('admin');
         }
 
-        if (e.target.matches('#role-superadmin')) {
-            document.getElementById('form-pilih-role').classList.add('hidden');
-            login('admin'); 
-        }
 
         if (e.target.matches('#role-pengguna')) {
             document.getElementById('form-pilih-role').classList.add('hidden');
@@ -2790,8 +2910,8 @@ ${diagramSyntax}
         }
 
        
-        if (e.target.matches('#logout-btn-user') || e.target.matches('#logout-btn-admin')) {
-             showConfirmModal('Konfirmasi Logout', 'Apakah Anda yakin ingin keluar?', logout);
+        if (e.target.matches('#logout-btn-user') || e.target.matches('#logout-btn-admin') || e.target.matches('#logout-btn-superadmin')) {
+            showConfirmModal('Konfirmasi Logout', 'Apakah Anda yakin ingin keluar?', logout);
         }
 
         // --- Navigation ---
@@ -2951,18 +3071,21 @@ ${diagramSyntax}
             return [];
         }
 
-        function renderBlockedEvents() {
-            calendar.getEvents().forEach(event => event.remove());
-            blockedDates.forEach(item => {
-                calendar.addEvent({
-                    title: `❌ Diblok (${item.timeLabel})`,
-                    start: `${item.date}T${item.time}`,
-                    allDay: true,
-                    backgroundColor: '#f87171',
-                    borderColor: '#f87171'
-                });
+       function renderBlockedEvents() {
+        calendar.getEvents().forEach(event => event.remove());
+        blockedDates.forEach(item => {
+            // Persingkat judul agar lebih ringkas
+            const shortTitle = item.timeLabel === "Full Day" ? "❌ Diblokir" : `❌ Diblokir (${item.timeLabel})`;
+
+            calendar.addEvent({
+                title: shortTitle, // Gunakan judul yang lebih pendek
+                start: `${item.date}T${item.time}`,
+                allDay: true,
+                backgroundColor: '#f87171',
+                borderColor: '#f87171'
             });
-        }
+        });
+    }
 
         function isBlocked(date, time) {
             return blockedDates.some(item => item.date === date && item.time === time);
@@ -2997,6 +3120,12 @@ ${diagramSyntax}
                     calendar = new FullCalendar.Calendar(calendarEl, {
                         initialView: 'dayGridMonth',
                         selectable: true,
+                        // --- KODE BARU DIMULAI DI SINI ---
+                        dayCellDidMount: function(info) {
+                            // Menambahkan class kustom ke setiap sel hari untuk styling
+                            info.el.classList.add('custom-day-cell');
+                        },
+                        // --- KODE BARU BERAKHIR DI SINI ---
                         select: function (info) {
                             const date = info.startStr;
                             const time = "00:00:00";
